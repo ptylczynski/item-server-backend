@@ -1,21 +1,24 @@
 package cloud.ptl.itemserver.templates;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
+import cloud.ptl.itemserver.BeanInjector;
+import lombok.*;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
+import org.springframework.stereotype.Component;
 
-@AllArgsConstructor
 @Data
 public class ConfirmationTemplate {
+
     public enum Token{
         DELETE("deleted.successful"),
         ADD("added.successful"),
-        UPDATE("update.successful");
+        UPDATE("updated.successful");
 
         private final String sToken;
 
@@ -28,18 +31,25 @@ public class ConfirmationTemplate {
         }
     }
 
-    @Autowired
     private MessageSource messageSource;
 
     private Token token;
     private String className;
-    private Link 
+    private Link link;
+
+    public ConfirmationTemplate(Token token, String className, Link link){
+        this.token = token;
+        this.className = className;
+        this.link = link;
+
+        this.messageSource = (MessageSource) BeanInjector.getBean(MessageSource.class);
+    }
 
     public EntityModel<String> getEntityModel(){
-        EntityModel.of(
+        return EntityModel.of(
                 this.getMessage(),
-
-        )
+                link
+        );
     }
 
     private String getMessage(){

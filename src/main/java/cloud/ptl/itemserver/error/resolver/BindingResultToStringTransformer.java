@@ -17,17 +17,20 @@ public class BindingResultToStringTransformer {
     private MessageSource messageSource;
 
     public String transform(BindingResult bindingResult){
-        StringBuilder sb = new StringBuilder();
         for(ObjectError error : bindingResult.getAllErrors()){
-            sb.append(
-
-                    messageSource.getMessage(
-                            error.getCodes()[0],
+            if(error.getCodes() != null) {
+                for (String code : error.getCodes()){
+                    String message = messageSource.getMessage(
+                            code,
                             new Object[0],
-                            Arrays.toString(error.getCodes()),
-                            LocaleContextHolder.getLocale())
-            );
+                            "error",
+                            LocaleContextHolder.getLocale()
+                    );
+                    if(!message.equals("error")) return message;
+                }
+            }
         }
-        return sb.toString();
+        return Arrays.toString(bindingResult.getAllErrors().toArray());
     }
 }
+

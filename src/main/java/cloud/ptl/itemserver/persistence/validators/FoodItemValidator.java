@@ -32,21 +32,48 @@ public class FoodItemValidator implements Validator {
         else {
             FoodItemDAO foodItemDAO = (FoodItemDAO) o;
 
-            // is due date after added date
             LocalDate dateAdded = foodItemDAO.getDateAdded();
             LocalDate dueDate = foodItemDAO.getDueDate();
+
+            // does due date exist in request
+            if(dateAdded == null){
+                errors.rejectValue("dueDate", "due.date.missing");
+                return;
+            }
+
+            // does date added exist in request
+            if(dueDate == null){
+                errors.rejectValue("dateAdded", "date.added.missing");
+                return;
+            }
+
+            // is due date after added date
             if(dueDate.isBefore(dateAdded)){
                 errors.rejectValue("dueDate","due.date.before.date.added");
             }
 
             // does address exist
             AddressDAO addressDAO = foodItemDAO.getAddressDAO();
+
+            // does address exist in request
+            if(addressDAO == null){
+                errors.rejectValue("addressDAO", "address.missing");
+                return;
+            }
+
             if(!addressRepository.existsById(addressDAO.getId())){
-                errors.rejectValue("addressDAO", "storage.address.does.not.exist");
+                errors.rejectValue("addressDAO", "address.does.not.exist");
             }
 
             // does food type exist
             FoodTypeDAO foodTypeDAO = foodItemDAO.getType();
+
+            // does food types exist in request
+            if(foodTypeDAO == null){
+                errors.rejectValue("type", "type.missing");
+                return;
+            }
+
             if(!foodTypeRepository.existsById(foodTypeDAO.getId())){
                 errors.rejectValue("foodType", "food.type.does.not.exist");
             }

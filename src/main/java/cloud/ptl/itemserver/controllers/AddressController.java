@@ -6,6 +6,7 @@ import cloud.ptl.itemserver.error.exception.item.ObjectNotFound;
 import cloud.ptl.itemserver.persistence.dao.address.AddressDAO;
 import cloud.ptl.itemserver.persistence.dao.item.food.FoodItemDAO;
 import cloud.ptl.itemserver.persistence.repositories.address.AddressRepository;
+import cloud.ptl.itemserver.templates.ConfirmationTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -69,8 +70,11 @@ public class AddressController {
                     WebMvcLinkBuilder.linkTo(AddressController.class).withSelfRel()
             );
         addressRepository.save(addressDAO);
-        return EntityModel.of("Address added",
-                linkTo(AddressController.class).withRel("controller"));
+        return new ConfirmationTemplate(
+            ConfirmationTemplate.Token.ADD,
+                AddressDAO.class.getName(),
+                linkTo(AddressController.class).withRel("controller")
+        ).getEntityModel();
     }
 
     @DeleteMapping("/{id}")
@@ -86,8 +90,12 @@ public class AddressController {
                         ).withSelfRel()
                 );
             this.addressRepository.delete(addressDAO.get());
-            return EntityModel.of(
-                    "Item"
-            )
+        return new ConfirmationTemplate(
+                ConfirmationTemplate.Token.DELETE,
+                AddressDAO.class.getName(),
+                linkTo(
+                        methodOn(AddressController.class).delete(id)
+                ).withRel("controller")
+        ).getEntityModel();
     }
 }

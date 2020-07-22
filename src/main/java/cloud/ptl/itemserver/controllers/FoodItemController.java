@@ -6,6 +6,7 @@ import cloud.ptl.itemserver.error.resolver.manager.BasicErrorResolverManager;
 import cloud.ptl.itemserver.persistence.dao.item.food.FoodItemDAO;
 import cloud.ptl.itemserver.persistence.repositories.item.FoodItemRepository;
 import cloud.ptl.itemserver.persistence.validators.FoodItemValidator;
+import cloud.ptl.itemserver.templates.ConfirmationTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -80,8 +81,11 @@ public class FoodItemController {
                                        BindingResult bindingResult) throws ObjectInvalid {
         if(!bindingResult.hasErrors()){
             foodItemRepository.save(foodItemDAO);
-            return EntityModel.of("Item saved",
-                    linkTo(FoodItemController.class).withRel("get"));
+            return new ConfirmationTemplate(
+                    ConfirmationTemplate.Token.ADD,
+                    FoodItemDAO.class.getName(),
+                    linkTo(FoodItemController.class).withSelfRel()
+            ).getEntityModel();
         }
         else {
             logger.debug(
@@ -93,5 +97,29 @@ public class FoodItemController {
                     linkTo(FoodItemController.class).withSelfRel()
             );
         }
+    }
+
+    @DeleteMapping("/{id}")
+    public EntityModel<String> delete(
+            @PathVariable Long id
+    ) throws ObjectNotFound {
+        Optional<FoodItemDAO> foodItemDAO = this.foodItemRepository.findById(id);
+        if(foodItemDAO.isEmpty()) throw new ObjectNotFound(
+                id,
+                linkTo(
+                        methodOn(FoodItemController.class).delete(id)
+                ).withSelfRel()
+        );
+        else{
+            this.foodItemRepository.delete(foodItemDAO.get());
+            return new ConfirmationTemplate(
+                    ConfirmationTemplate.Token.DELETE,
+                    FoodItemDAO.class.getName(),
+                    linkTo(
+                            methodOn(FoodItemController.class).delete(id)
+                    ).withSelfRel()
+            ).getEntityModel();
+        }
+
     }
 }

@@ -5,7 +5,9 @@ import cloud.ptl.itemserver.error.exception.item.ObjectInvalid;
 import cloud.ptl.itemserver.error.exception.item.ObjectNotFound;
 import cloud.ptl.itemserver.error.resolver.manager.BasicErrorResolverManager;
 import cloud.ptl.itemserver.persistence.dao.item.food.FoodTypeDAO;
+import cloud.ptl.itemserver.persistence.dao.item.generics.ItemTypeDAO;
 import cloud.ptl.itemserver.persistence.repositories.item.FoodTypeRepository;
+import cloud.ptl.itemserver.templates.ConfirmationTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -75,6 +77,28 @@ public class ItemTypeController {
 
         return EntityModel.of("Food type added",
                 linkTo(ItemTypeController.class).withRel("controller"));
+    }
 
+    @DeleteMapping("/food/{id}")
+    public EntityModel<String> delete(
+            @PathVariable Long id
+    ) throws ObjectNotFound {
+        Optional<FoodTypeDAO> foodTypeDAO = this.foodTypeRepository.findById(id);
+        if(foodTypeDAO.isEmpty()) throw new ObjectNotFound(
+                id,
+                linkTo(
+                        methodOn(ItemTypeController.class).delete(id)
+                ).withSelfRel()
+        );
+        else{
+            this.foodTypeRepository.delete(foodTypeDAO.get());
+            return new ConfirmationTemplate(
+                    ConfirmationTemplate.Token.DELETE,
+                    FoodTypeDAO.class.getName(),
+                    linkTo(
+                            methodOn(ItemTypeController.class).delete(id)
+                    ).withSelfRel()
+            ).getEntityModel();
+        }
     }
 }

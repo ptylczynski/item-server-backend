@@ -18,6 +18,7 @@ import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.servlet.i18n.AcceptHeaderLocaleResolver;
 import org.springframework.web.servlet.i18n.CookieLocaleResolver;
 import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
 
@@ -30,10 +31,10 @@ public class ItemServerApplication implements WebMvcConfigurer {
         SpringApplication.run(ItemServerApplication.class, args);
     }
 
-    @Override
-    public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(localeChangeInterceptor());
-    }
+//    @Override
+//    public void addInterceptors(InterceptorRegistry registry) {
+//        registry.addInterceptor(localeChangeInterceptor());
+//    }
 
     @Bean
     public MessageSource messageSource(){
@@ -46,19 +47,27 @@ public class ItemServerApplication implements WebMvcConfigurer {
 
     @Bean
     public LocaleResolver localeResolver(){
-        CookieLocaleResolver cookieLocaleResolver =
-                new CookieLocaleResolver();
-        cookieLocaleResolver.setCookieName("lang");
-        cookieLocaleResolver.setDefaultLocale(Locale.ENGLISH);
-        return cookieLocaleResolver;
+        AcceptHeaderLocaleResolver acceptHeaderLocaleResolver =
+                new AcceptHeaderLocaleResolver();
+        acceptHeaderLocaleResolver.setDefaultLocale(Locale.ENGLISH);
+        return acceptHeaderLocaleResolver;
     }
 
-    @Bean
-    public LocaleChangeInterceptor localeChangeInterceptor(){
-        LocaleChangeInterceptor localeChangeInterceptor =
-                new LocaleChangeInterceptor();
-        localeChangeInterceptor.setParamName("lang");
-        return localeChangeInterceptor;
-    }
+//    @Bean
+//    public LocaleResolver localeResolver(){
+//        CookieLocaleResolver cookieLocaleResolver =
+//                new CookieLocaleResolver();
+//        cookieLocaleResolver.setCookieName("lang");
+//        cookieLocaleResolver.setDefaultLocale(Locale.ENGLISH);
+//        return cookieLocaleResolver;
+//    }
+
+//    @Bean
+//    public LocaleChangeInterceptor localeChangeInterceptor(){
+//        LocaleChangeInterceptor localeChangeInterceptor =
+//                new LocaleChangeInterceptor();
+//        localeChangeInterceptor.setParamName("lang");
+//        return localeChangeInterceptor;
+//    }
 
 }

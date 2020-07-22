@@ -1,5 +1,6 @@
 package cloud.ptl.itemserver.error.resolver.manager;
 
+import cloud.ptl.itemserver.error.resolver.provider.DataIntegrityViolationResolverProvider;
 import cloud.ptl.itemserver.templates.ErrorTemplate;
 import cloud.ptl.itemserver.error.resolver.provider.AbstractErrorResolverProvider;
 import cloud.ptl.itemserver.error.resolver.provider.ObjectInvalidResolverProvider;
@@ -21,6 +22,9 @@ public class BasicErrorResolverManager extends ErrorResolverManager {
     @Autowired
     private ObjectInvalidResolverProvider objectInvalidResolverProvider;
 
+    @Autowired
+    private DataIntegrityViolationResolverProvider dataIntegrityViolationResolverProvider;
+
     private ArrayList<AbstractErrorResolverProvider> providers;
 
     @PostConstruct
@@ -28,6 +32,7 @@ public class BasicErrorResolverManager extends ErrorResolverManager {
         this.providers = new ArrayList<>();
         this.providers.add(objectInvalidResolverProvider);
         this.providers.add(objectNotFoundResolverProvider);
+        this.providers.add(dataIntegrityViolationResolverProvider);
     }
 
     @Override
