@@ -4,6 +4,7 @@ import cloud.ptl.itemserver.persistence.dao.AbstractDAO;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -15,7 +16,6 @@ import java.util.Set;
 @Entity(name = "user")
 @Table(name = "user")
 @Data
-@Builder
 public class UserDAO extends AbstractDAO {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -36,7 +36,7 @@ public class UserDAO extends AbstractDAO {
     )
     private List<AuthorityDAO> authorityDAOList;
 
-    private UserDetails toUser(){
+    public User toUser(){
         return new User(
                 this.username,
                 this.password,

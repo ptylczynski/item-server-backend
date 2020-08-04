@@ -122,4 +122,29 @@ public class FoodItemController {
         }
 
     }
+
+    @PutMapping("/{id}")
+    public EntityModel<String> put(
+            @ModelAttribute @Validated FoodItemDAO foodItemDAO,
+            BindingResult bindingResult
+    ) throws ObjectInvalid, ObjectNotFound {
+        if(bindingResult.hasErrors())
+            throw new ObjectInvalid(
+                    foodItemDAO,
+                    bindingResult,
+                    linkTo(FoodItemController.class).withSelfRel()
+            );
+        Optional<FoodItemDAO> oldFoodItem = this.foodItemRepository.findById(foodItemDAO.getId());
+        if(oldFoodItem.isEmpty())
+            throw new ObjectNotFound(
+                    foodItemDAO.getId(),
+                    linkTo(FoodItemController.class).withSelfRel()
+            );
+        this.foodItemRepository.save(foodItemDAO);
+        return new ConfirmationTemplate(
+                ConfirmationTemplate.Token.PUT,
+                FoodItemController.class.getName(),
+                linkTo(FoodItemController.class).withSelfRel()
+        ).getEntityModel();
+    }
 }

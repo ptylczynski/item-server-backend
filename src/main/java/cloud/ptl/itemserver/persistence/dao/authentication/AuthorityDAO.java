@@ -7,7 +7,6 @@ import org.springframework.security.core.GrantedAuthority;
 
 import javax.persistence.*;
 
-@EqualsAndHashCode(callSuper = true)
 @Data
 @Entity
 @Table(name = "authorities")

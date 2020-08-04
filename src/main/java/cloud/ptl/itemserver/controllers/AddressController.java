@@ -98,4 +98,29 @@ public class AddressController {
                 ).withRel("controller")
         ).getEntityModel();
     }
+
+    @PutMapping("/{id}")
+    public EntityModel<String> put(
+            @ModelAttribute AddressDAO addressDAO,
+            BindingResult bindingResult
+    ) throws ObjectInvalid, ObjectNotFound {
+        if(bindingResult.hasErrors())
+            throw new ObjectInvalid(
+                    addressDAO,
+                    bindingResult,
+                    linkTo(AddressController.class).withSelfRel()
+            );
+        Optional<AddressDAO> oldAddressDAO = this.addressRepository.findById(addressDAO.getId());
+        if(oldAddressDAO.isEmpty())
+            throw new ObjectNotFound(
+                    addressDAO.getId(),
+                    linkTo(AddressController.class).withSelfRel()
+            );
+        this.addressRepository.save(addressDAO);
+        return new ConfirmationTemplate(
+                ConfirmationTemplate.Token.PUT,
+                AddressDAO.class.getName(),
+                linkTo(AddressController.class).withSelfRel()
+        ).getEntityModel();
+    }
 }

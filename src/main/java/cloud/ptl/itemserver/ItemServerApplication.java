@@ -13,6 +13,7 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.format.FormatterRegistry;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.validation.Validator;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.web.servlet.LocaleResolver;
@@ -25,6 +26,7 @@ import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
 import java.util.Locale;
 
 @SpringBootApplication
+@EnableWebSecurity
 public class ItemServerApplication implements WebMvcConfigurer {
 
     public static void main(String[] args) {

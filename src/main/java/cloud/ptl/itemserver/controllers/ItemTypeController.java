@@ -14,6 +14,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
@@ -100,5 +101,36 @@ public class ItemTypeController {
                     ).withSelfRel()
             ).getEntityModel();
         }
+    }
+
+    @PutMapping("/food/{id}")
+    public EntityModel<String> put(
+            @ModelAttribute @Validated FoodTypeDAO foodTypeDAO,
+            BindingResult bindingResult
+    ) throws ObjectInvalid, ObjectNotFound {
+        if(bindingResult.hasErrors())
+            throw new ObjectInvalid(
+                    foodTypeDAO,
+                    bindingResult,
+                    linkTo(
+                            methodOn(ItemTypeController.class).put(foodTypeDAO, bindingResult)
+                    ).withSelfRel()
+            );
+        Optional<FoodTypeDAO> oldFoodTypeDAO = this.foodTypeRepository.findById(foodTypeDAO.getId());
+        if(oldFoodTypeDAO.isEmpty())
+            throw new ObjectNotFound(
+                    foodTypeDAO.getId(),
+                    linkTo(
+                            methodOn(ItemTypeController.class).put(foodTypeDAO, bindingResult)
+                    ).withSelfRel()
+            );
+        this.foodTypeRepository.save(foodTypeDAO);
+        return new ConfirmationTemplate(
+                ConfirmationTemplate.Token.PUT,
+                ItemTypeController.class.getName(),
+                linkTo(
+                        methodOn(ItemTypeController.class).put(foodTypeDAO, bindingResult)
+                ).withSelfRel()
+        ).getEntityModel();
     }
 }

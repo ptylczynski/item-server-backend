@@ -3,8 +3,10 @@ package cloud.ptl.itemserver.persistence.dao.address;
 import cloud.ptl.itemserver.persistence.dao.AbstractDAO;
 import cloud.ptl.itemserver.persistence.dao.item.generics.ItemDAO;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import net.minidev.json.annotate.JsonIgnore;
 
 import javax.persistence.*;
