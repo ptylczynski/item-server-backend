@@ -17,6 +17,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.validation.Validator;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.web.servlet.LocaleResolver;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.i18n.AcceptHeaderLocaleResolver;
@@ -33,7 +34,14 @@ public class ItemServerApplication implements WebMvcConfigurer {
         SpringApplication.run(ItemServerApplication.class, args);
     }
 
-//    @Override
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry
+                .addMapping("/**")
+                    .allowedOrigins("http://localhost:4200");
+    }
+
+    //    @Override
 //    public void addInterceptors(InterceptorRegistry registry) {
 //        registry.addInterceptor(localeChangeInterceptor());
 //    }

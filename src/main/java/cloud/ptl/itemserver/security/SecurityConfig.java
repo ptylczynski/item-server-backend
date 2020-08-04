@@ -33,6 +33,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .formLogin().disable()
                 .csrf().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+        // allow CORS pre-flight OPTIONS requests
+        http.cors();
     }
 
     @Override
