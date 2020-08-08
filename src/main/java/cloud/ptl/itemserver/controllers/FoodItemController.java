@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.util.Pair;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.validation.BindingResult;
@@ -19,6 +20,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.Optional;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
@@ -43,6 +45,15 @@ public class FoodItemController {
     }
 
     private Logger logger = LoggerFactory.getLogger(FoodItemController.class);
+
+    @GetMapping("/number")
+    public EntityModel<Long> getNumber(){
+        Long totalCount = this.foodItemRepository.count();
+        return EntityModel.of(
+                totalCount,
+                linkTo(methodOn(FoodItemController.class).getNumber()).withSelfRel()
+        );
+    }
 
     @GetMapping("/{id}")
     public EntityModel<FoodItemDAO> getOne(
