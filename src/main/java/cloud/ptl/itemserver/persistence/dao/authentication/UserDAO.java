@@ -21,6 +21,7 @@ public class UserDAO extends AbstractDAO {
     private Long id;
 
     private String username;
+    private String displayName;
     private String password;
     private String mail;
     private Boolean isEnabled;

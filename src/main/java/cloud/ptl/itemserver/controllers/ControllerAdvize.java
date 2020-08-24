@@ -1,11 +1,11 @@
 package cloud.ptl.itemserver.controllers;
 
-import cloud.ptl.itemserver.error.exception.item.ObjectInvalid;
-import cloud.ptl.itemserver.error.exception.item.ObjectNotFound;
+import cloud.ptl.itemserver.error.exception.parsing.ObjectInvalid;
+import cloud.ptl.itemserver.error.exception.missing.ObjectNotFound;
 import cloud.ptl.itemserver.templates.ErrorTemplate;
 import cloud.ptl.itemserver.error.resolver.manager.BasicErrorResolverManager;
-import cloud.ptl.itemserver.persistence.conversion.AddressEditor;
-import cloud.ptl.itemserver.persistence.conversion.FoodTypeEditor;
+import cloud.ptl.itemserver.persistence.conversion.spring.AddressEditor;
+import cloud.ptl.itemserver.persistence.conversion.spring.FoodTypeEditor;
 import cloud.ptl.itemserver.persistence.dao.address.AddressDAO;
 import cloud.ptl.itemserver.persistence.dao.item.food.FoodTypeDAO;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,8 +14,6 @@ import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
-
-import java.sql.SQLIntegrityConstraintViolationException;
 
 @ControllerAdvice
 public class ControllerAdvize {

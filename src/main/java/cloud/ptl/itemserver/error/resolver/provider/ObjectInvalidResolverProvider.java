@@ -1,6 +1,6 @@
 package cloud.ptl.itemserver.error.resolver.provider;
 
-import cloud.ptl.itemserver.error.exception.item.ObjectInvalid;
+import cloud.ptl.itemserver.error.exception.parsing.ObjectInvalid;
 import cloud.ptl.itemserver.error.resolver.BindingResultToStringTransformer;
 import cloud.ptl.itemserver.templates.ErrorTemplate;
 import org.springframework.beans.factory.annotation.Autowired;

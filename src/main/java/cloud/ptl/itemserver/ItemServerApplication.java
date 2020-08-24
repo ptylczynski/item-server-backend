@@ -1,32 +1,21 @@
 package cloud.ptl.itemserver;
 
-import cloud.ptl.itemserver.error.exception.item.ObjectInvalid;
-import cloud.ptl.itemserver.error.resolver.manager.BasicErrorResolverManager;
-import cloud.ptl.itemserver.error.resolver.manager.ErrorResolverManager;
-import cloud.ptl.itemserver.error.resolver.provider.AbstractErrorResolverProvider;
-import cloud.ptl.itemserver.error.resolver.provider.ObjectInvalidResolverProvider;
-import cloud.ptl.itemserver.error.resolver.provider.ObjectNotFoundResolverProvider;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
-import org.springframework.format.FormatterRegistry;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.validation.Validator;
-import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
-import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.i18n.AcceptHeaderLocaleResolver;
-import org.springframework.web.servlet.i18n.CookieLocaleResolver;
-import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
 
 import java.util.Locale;
 
 @SpringBootApplication
+@EnableJpaRepositories
 @EnableWebSecurity
 public class ItemServerApplication implements WebMvcConfigurer {
 
@@ -38,7 +27,8 @@ public class ItemServerApplication implements WebMvcConfigurer {
     public void addCorsMappings(CorsRegistry registry) {
         registry
                 .addMapping("/**")
-                    .allowedOrigins("http://localhost:4200");
+                    .allowedOrigins("http://localhost:4200")
+                    .allowedMethods("GET", "POST", "DELETE", "PUT");
     }
 
     //    @Override

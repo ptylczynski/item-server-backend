@@ -1,4 +1,4 @@
-package cloud.ptl.itemserver.persistence.conversion;
+package cloud.ptl.itemserver.persistence.conversion.spring;
 
 import cloud.ptl.itemserver.BeanInjector;
 import cloud.ptl.itemserver.persistence.dao.address.AddressDAO;

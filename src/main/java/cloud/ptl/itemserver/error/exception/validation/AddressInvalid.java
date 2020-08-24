@@ -1,4 +1,4 @@
-package cloud.ptl.itemserver.error.exception.address;
+package cloud.ptl.itemserver.error.exception.validation;
 
 import cloud.ptl.itemserver.persistence.dao.address.AddressDAO;
 import lombok.Data;

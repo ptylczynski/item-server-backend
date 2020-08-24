@@ -1,6 +1,6 @@
 package cloud.ptl.itemserver.error.resolver.provider;
 
-import cloud.ptl.itemserver.error.exception.item.ObjectNotFound;
+import cloud.ptl.itemserver.error.exception.missing.ObjectNotFound;
 import cloud.ptl.itemserver.templates.ErrorTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;

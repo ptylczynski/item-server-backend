@@ -5,7 +5,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.Repository;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public interface AddressRepository extends JpaRepository<AddressDAO, Long> {
     Page<AddressDAO> findAll(Pageable pageable);
+    <T> ArrayList<T> findBy(Class<T> type);
+    <T> ArrayList<T> findById(Long id, Class<T> type);
 }

@@ -1,4 +1,4 @@
-package cloud.ptl.itemserver.error.exception.item;
+package cloud.ptl.itemserver.error.exception.parsing;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
