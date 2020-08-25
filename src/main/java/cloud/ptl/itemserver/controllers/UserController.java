@@ -1,6 +1,10 @@
 package cloud.ptl.itemserver.controllers;
 
 import cloud.ptl.itemserver.error.exception.missing.ObjectNotFound;
+import cloud.ptl.itemserver.persistence.conversion.dto.user.UserCensoredModelAssembler;
+import cloud.ptl.itemserver.persistence.dao.authentication.UserDAO;
+import cloud.ptl.itemserver.persistence.dto.user.UserCensoredDTO;
+import cloud.ptl.itemserver.persistence.helper.UserService;
 import cloud.ptl.itemserver.persistence.projections.userDAO.UserCensored;
 import cloud.ptl.itemserver.persistence.repositories.security.UserRepository;
 import org.slf4j.Logger;
@@ -14,7 +18,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
 import java.util.Optional;
 
 @RestController
@@ -26,40 +29,39 @@ public class UserController {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private UserCensoredModelAssembler userCensoredModelAssembler;
+
+    @Autowired
+    private UserService userService;
+
     @GetMapping("/{id}")
-    public EntityModel<UserCensored> getOne(
+    public UserCensoredDTO getOne(
             @PathVariable Long id
     ) throws ObjectNotFound {
         this.logger.info("Getting info about user");
         this.logger.debug("Id is: " + id);
+        this.userService.checkIfUserExist(id);
         Optional<UserCensored> userDAO = this.userRepository.findById(id, UserCensored.class);
-        if(userDAO.isEmpty()){
-            this.logger.debug("User with id: " + id + " not found");
-            throw new ObjectNotFound(
-                    id,
-                    WebMvcLinkBuilder.linkTo(
-                            WebMvcLinkBuilder.methodOn(UserController.class).getOne(id)
-                    ).withSelfRel()
-            );
-        }
-        this.logger.debug("User found");
         this.logger.debug(userDAO.get().toString());
-        return EntityModel.of(
-                userDAO.get(),
-                WebMvcLinkBuilder.linkTo(
+        return this.userCensoredModelAssembler
+                .toModel(userDAO.get())
+                .add(
+                    WebMvcLinkBuilder.linkTo(
                         WebMvcLinkBuilder.methodOn(UserController.class).getOne(id)
-                ).withSelfRel()
-        );
+                    ).withSelfRel()
+                );
     }
 
     @GetMapping("/all")
-    public CollectionModel<UserCensored> getAll(){
-        ArrayList<UserCensored> users = this.userRepository.findBy(UserCensored.class);
-        return CollectionModel.of(
-                users,
-                WebMvcLinkBuilder.linkTo(
+    public CollectionModel<UserCensoredDTO> getAll(){
+        Iterable<UserDAO> users = this.userRepository.findBy(UserDAO.class);
+        return this.userCensoredModelAssembler
+                .toCollectionModel(users)
+                .add(
+                    WebMvcLinkBuilder.linkTo(
                         WebMvcLinkBuilder.methodOn(UserController.class).getAll()
-                ).withSelfRel()
-        );
+                    ).withSelfRel()
+                );
     }
 }

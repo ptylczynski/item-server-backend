@@ -1,6 +1,8 @@
 package cloud.ptl.itemserver.persistence.dao.authentication;
 
 import cloud.ptl.itemserver.persistence.dao.AbstractDAO;
+import cloud.ptl.itemserver.persistence.dao.address.AddressDAO;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -12,7 +14,7 @@ import javax.persistence.*;
 import java.util.List;
 import java.util.Set;
 
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode(exclude = "locatorOf")
 @Entity(name = "user")
 @Table(name = "user")
 @Data
@@ -36,6 +38,9 @@ public class UserDAO extends AbstractDAO {
             inverseJoinColumns = @JoinColumn(name = "authority_fk")
     )
     private List<AuthorityDAO> authorityDAOList;
+
+    @ManyToOne
+    private AddressDAO locatorOf;
 
     public User toUser(){
         return new User(

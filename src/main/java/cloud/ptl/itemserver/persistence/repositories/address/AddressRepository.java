@@ -9,9 +9,10 @@ import org.springframework.data.repository.Repository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public interface AddressRepository extends JpaRepository<AddressDAO, Long> {
     Page<AddressDAO> findAll(Pageable pageable);
     <T> ArrayList<T> findBy(Class<T> type);
-    <T> ArrayList<T> findById(Long id, Class<T> type);
+    <T> Optional<T> findById(Long id, Class<T> type);
 }

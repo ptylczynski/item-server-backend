@@ -18,7 +18,8 @@ public class ConfirmationTemplate {
     public enum Token{
         DELETE("deleted.successful"),
         ADD("added.successful"),
-        PUT("put.successful");
+        PUT("put.successful"),
+        PATCH("patch.successful");
 
         private final String sToken;
 

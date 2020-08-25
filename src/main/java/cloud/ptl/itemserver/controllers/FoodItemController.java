@@ -3,7 +3,9 @@ package cloud.ptl.itemserver.controllers;
 import cloud.ptl.itemserver.error.exception.parsing.ObjectInvalid;
 import cloud.ptl.itemserver.error.exception.missing.ObjectNotFound;
 import cloud.ptl.itemserver.error.resolver.manager.BasicErrorResolverManager;
+import cloud.ptl.itemserver.persistence.conversion.dto.item.FullFoodItemModelAssembler;
 import cloud.ptl.itemserver.persistence.dao.item.food.FoodItemDAO;
+import cloud.ptl.itemserver.persistence.dto.item.FullFoodItemDTO;
 import cloud.ptl.itemserver.persistence.repositories.item.FoodItemRepository;
 import cloud.ptl.itemserver.persistence.validators.FoodItemValidator;
 import cloud.ptl.itemserver.templates.ConfirmationTemplate;
@@ -39,6 +41,9 @@ public class FoodItemController {
     @Autowired
     private FoodItemValidator foodItemValidator;
 
+    @Autowired
+    private FullFoodItemModelAssembler fullFoodItemModelAssembler;
+
     @InitBinder
     protected void initBinder(WebDataBinder webDataBinder){
         webDataBinder.addValidators(foodItemValidator);
@@ -70,7 +75,7 @@ public class FoodItemController {
     }
  // TODO documentation
     @GetMapping("/{id}")
-    public EntityModel<FoodItemDAO> getOne(
+    public FullFoodItemDTO getOne(
             @PathVariable Long id) throws ObjectNotFound {
         this.logger.info("Getting one item");
         this.logger.debug("Item id: " + id.toString());
@@ -86,9 +91,13 @@ public class FoodItemController {
         }
         this.logger.debug("Item found");
         this.logger.debug(foodItemDAO.get().toString());
-        return EntityModel.of(
-                foodItemDAO.get(),
-                linkTo(methodOn(FoodItemController.class).getOne(id)).withSelfRel());
+        return this.fullFoodItemModelAssembler
+                .toModel(foodItemDAO.get())
+                .add(
+                        linkTo(
+                                methodOn(FoodItemController.class).getOne(id)
+                        ).withSelfRel()
+                );
     }
 
     @GetMapping("/all")
