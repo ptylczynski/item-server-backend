@@ -13,13 +13,8 @@ import org.springframework.data.repository.Repository;
 import java.util.List;
 import java.util.Optional;
 
-public interface FoodItemRepository extends Repository<FoodItemDAO, Long> {
+public interface FoodItemRepository extends JpaRepository<FoodItemDAO, Long> {
     Page<FoodItemDAO> findAll(Pageable pageable);
     List<FoodItemDAO> findAll();
-    Long count();
     Optional<FoodItemDAO> findById(Long id);
-    void save(FoodItemDAO foodItemDAO);
-    void deleteById(Long id);
-    void delete(FoodItemDAO foodItemDAO);
-
 }

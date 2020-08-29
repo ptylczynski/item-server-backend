@@ -6,6 +6,7 @@ import cloud.ptl.itemserver.error.resolver.manager.BasicErrorResolverManager;
 import cloud.ptl.itemserver.persistence.conversion.dto.item.FullFoodItemModelAssembler;
 import cloud.ptl.itemserver.persistence.dao.item.food.FoodItemDAO;
 import cloud.ptl.itemserver.persistence.dto.item.FullFoodItemDTO;
+import cloud.ptl.itemserver.persistence.helper.FoodItemService;
 import cloud.ptl.itemserver.persistence.repositories.item.FoodItemRepository;
 import cloud.ptl.itemserver.persistence.validators.FoodItemValidator;
 import cloud.ptl.itemserver.templates.ConfirmationTemplate;
@@ -44,6 +45,9 @@ public class FoodItemController {
     @Autowired
     private FullFoodItemModelAssembler fullFoodItemModelAssembler;
 
+    @Autowired
+    private FoodItemService foodItemService;
+
     @InitBinder
     protected void initBinder(WebDataBinder webDataBinder){
         webDataBinder.addValidators(foodItemValidator);
@@ -53,9 +57,10 @@ public class FoodItemController {
 
     @GetMapping("/number")
     public EntityModel<Long> getNumber(){
+        this.logger.info("-----------");
         this.logger.info("Checking number of all intems");
         Long totalCount = this.foodItemRepository.count();
-        this.logger.debug("Total number of items is" + totalCount.toString());
+        this.logger.debug("Total number of items is " + totalCount.toString() + '\n');
         return EntityModel.of(
                 totalCount,
                 linkTo(methodOn(FoodItemController.class).getNumber()).withSelfRel()
@@ -64,7 +69,8 @@ public class FoodItemController {
 
     @GetMapping("/ids")
     public CollectionModel<Long> getIds(){
-        this.logger.info("Getting ids of all food items");
+        this.logger.info("-----------");
+        this.logger.info("Getting ids of all food items " + '\n');
         List<FoodItemDAO> foods = this.foodItemRepository.findAll();
         ArrayList<Long> ids = new ArrayList<>();
         for(FoodItemDAO food : foods) ids.add(food.getId());
@@ -77,18 +83,11 @@ public class FoodItemController {
     @GetMapping("/{id}")
     public FullFoodItemDTO getOne(
             @PathVariable Long id) throws ObjectNotFound {
+        this.logger.info("-----------");
         this.logger.info("Getting one item");
         this.logger.debug("Item id: " + id.toString());
         Optional<FoodItemDAO> foodItemDAO = foodItemRepository.findById(id);
-        if(foodItemDAO.isEmpty()) {
-            this.logger.debug("Item not found");
-            throw new ObjectNotFound(
-                    id,
-                    linkTo(
-                            methodOn(FoodItemController.class).getOne(id)
-                    ).withSelfRel()
-            );
-        }
+        this.foodItemService.checkIfFoodItemExists(id);
         this.logger.debug("Item found");
         this.logger.debug(foodItemDAO.get().toString());
         return this.fullFoodItemModelAssembler
@@ -101,34 +100,37 @@ public class FoodItemController {
     }
 
     @GetMapping("/all")
-    public CollectionModel<FoodItemDAO> getAll(
+    public CollectionModel<FullFoodItemDTO> getAll(
             @RequestParam(defaultValue = "0") Integer page,
             @RequestParam(defaultValue = "10") Integer size
     ){
+        this.logger.info("-----------");
         this.logger.info(String.format(
-                "Getting info of %d items on page %d",
+                "Getting info of %d items on page %d" + '\n',
                 page,
                 size
         ));
         Page<FoodItemDAO> foodItemDAOPage = foodItemRepository.findAll(
                 PageRequest.of(page, size)
         );
-        return CollectionModel.of(
-                foodItemDAOPage.getContent(),
-                linkTo(
-                        methodOn(FoodItemController.class).getAll(page, size)
-                ).withSelfRel()
-        );
+        return this.fullFoodItemModelAssembler.toCollectionModel(foodItemDAOPage.getContent())
+                .add(
+                    linkTo(
+                            methodOn(FoodItemController.class).getAll(page, size)
+                    ).withSelfRel()
+                );
     }
 
     @PostMapping()
     public EntityModel<String> postOne(@Validated FoodItemDAO foodItemDAO,
                                        BindingResult bindingResult) throws ObjectInvalid {
+        this.logger.info("-----------");
         this.logger.info("Saving food");
         this.logger.debug(foodItemDAO.toString());
         if(!bindingResult.hasErrors()){
-            this.logger.debug("Item is valid");
+            this.logger.debug("Item is valid " + '\n');
             foodItemRepository.save(foodItemDAO);
+            this.logger.info("-----------");
             return new ConfirmationTemplate(
                     ConfirmationTemplate.Token.ADD,
                     FoodItemDAO.class.getName(),
@@ -137,7 +139,7 @@ public class FoodItemController {
         }
         else {
             logger.debug(
-                    String.format("Food Item has errors: %s", bindingResult.getAllErrors().toString())
+                    String.format("Food Item has errors: %s" + '\n', bindingResult.getAllErrors().toString())
             );
             throw new ObjectInvalid(
                     foodItemDAO,
@@ -151,30 +153,20 @@ public class FoodItemController {
     public EntityModel<String> delete(
             @PathVariable Long id
     ) throws ObjectNotFound {
+        this.logger.info("-----------");
         this.logger.debug("Deleting item");
         this.logger.debug("Item id: " + id.toString());
         Optional<FoodItemDAO> foodItemDAO = this.foodItemRepository.findById(id);
-        if(foodItemDAO.isEmpty()) {
-            this.logger.debug("Item not found");
-            throw new ObjectNotFound(
-                    id,
-                    linkTo(
-                            methodOn(FoodItemController.class).delete(id)
-                    ).withSelfRel()
-            );
-        }
-        else{
-            this.logger.debug("Item deleted");
-            this.foodItemRepository.delete(foodItemDAO.get());
-            return new ConfirmationTemplate(
-                    ConfirmationTemplate.Token.DELETE,
-                    FoodItemDAO.class.getName(),
-                    linkTo(
-                            methodOn(FoodItemController.class).delete(id)
-                    ).withSelfRel()
-            ).getEntityModel();
-        }
-
+        this.foodItemService.checkIfFoodItemExists(id);
+        this.logger.debug("Item deleted" + '\n');
+        this.foodItemRepository.delete(foodItemDAO.get());
+        return new ConfirmationTemplate(
+                ConfirmationTemplate.Token.DELETE,
+                FoodItemDAO.class.getName(),
+                linkTo(
+                        methodOn(FoodItemController.class).delete(id)
+                ).withSelfRel()
+        ).getEntityModel();
     }
 
     @PutMapping("/{id}")
@@ -182,10 +174,11 @@ public class FoodItemController {
             @ModelAttribute @Validated FoodItemDAO foodItemDAO,
             BindingResult bindingResult
     ) throws ObjectInvalid, ObjectNotFound {
+        this.logger.info("-----------");
         this.logger.info("Updating food");
         this.logger.debug(foodItemDAO.toString());
         if(bindingResult.hasErrors()) {
-            this.logger.debug("Food has errors");
+            this.logger.debug("Food has errors" + '\n');
             this.logger.debug(bindingResult.getAllErrors().toString());
             throw new ObjectInvalid(
                     foodItemDAO,
@@ -194,14 +187,8 @@ public class FoodItemController {
             );
         }
         Optional<FoodItemDAO> oldFoodItem = this.foodItemRepository.findById(foodItemDAO.getId());
-        if(oldFoodItem.isEmpty()) {
-            this.logger.debug("Updating item does not exist");
-            throw new ObjectNotFound(
-                    foodItemDAO.getId(),
-                    linkTo(FoodItemController.class).withSelfRel()
-            );
-        }
-        this.logger.debug("Saving new food");
+        this.foodItemService.checkIfFoodItemExists(foodItemDAO.getId());
+        this.logger.debug("Saving new food" + '\n');
         this.foodItemRepository.save(foodItemDAO);
         return new ConfirmationTemplate(
                 ConfirmationTemplate.Token.PUT,

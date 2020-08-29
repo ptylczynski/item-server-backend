@@ -4,7 +4,10 @@ package cloud.ptl.itemserver.controllers;
 import cloud.ptl.itemserver.error.exception.parsing.ObjectInvalid;
 import cloud.ptl.itemserver.error.exception.missing.ObjectNotFound;
 import cloud.ptl.itemserver.error.resolver.manager.BasicErrorResolverManager;
+import cloud.ptl.itemserver.persistence.conversion.dto.itemType.FullItemTypeModelAssembler;
 import cloud.ptl.itemserver.persistence.dao.item.food.FoodTypeDAO;
+import cloud.ptl.itemserver.persistence.dto.itemType.FullItemTypeDTO;
+import cloud.ptl.itemserver.persistence.helper.FoodTypeService;
 import cloud.ptl.itemserver.persistence.repositories.item.FoodTypeRepository;
 import cloud.ptl.itemserver.templates.ConfirmationTemplate;
 import org.slf4j.Logger;
@@ -33,47 +36,54 @@ public class ItemTypeController {
     @Autowired
     private BasicErrorResolverManager basicErrorResolverManager;
 
+    @Autowired
+    private FullItemTypeModelAssembler fullItemTypeModelAssembler;
+
+    @Autowired
+    private FoodTypeService foodTypeService;
+
     private final Logger logger = LoggerFactory.getLogger(ItemTypeController.class);
 
     @GetMapping("/food/{id}")
-    public EntityModel<FoodTypeDAO> foodTypeDAOEntityModel(
+    public FullItemTypeDTO foodTypeDAOEntityModel(
             @PathVariable Long id) throws ObjectNotFound {
+        this.logger.info("-----------");
         this.logger.info("Getting food item type id" + id.toString());
+        this.foodTypeService.checkIfFoodTypeExists(id);
         Optional<FoodTypeDAO> foodTypeDAO = foodTypeRepository.findById(id);
-        if(foodTypeDAO.isEmpty()) {
-            this.logger.debug("Item does not exist");
-            throw new ObjectNotFound(
-                    id,
-                    linkTo(
-                            methodOn(ItemTypeController.class).foodTypeDAOEntityModel(id)
-                    ).withSelfRel()
-            );
-        }
-        return EntityModel.of(foodTypeDAO.get(),
-                linkTo(methodOn(ItemTypeController.class).foodTypeDAOEntityModel(id)).withSelfRel());
+        return fullItemTypeModelAssembler.toModel(foodTypeDAO.get())
+                .add(
+                        linkTo(
+                                methodOn(ItemTypeController.class).foodTypeDAOEntityModel(id)
+                        ).withSelfRel()
+                );
     }
 
     @GetMapping("/food/all")
-    public CollectionModel<FoodTypeDAO> getAll(
+    public CollectionModel<FullItemTypeDTO> getAll(
             @RequestParam(defaultValue = "0") Integer page,
             @RequestParam(defaultValue = "10") Integer size
     ){
+        this.logger.info("-----------");
         this.logger.info("Getting all food types");
         Page<FoodTypeDAO> foodTypeDAOS = foodTypeRepository.findAll(
                 PageRequest.of(page, size)
         );
-        return CollectionModel.of(
-                foodTypeDAOS.getContent(),
-                linkTo(
-                        methodOn(ItemTypeController.class).getAll(page, size)
-                ).withSelfRel()
-        );
+        return this.fullItemTypeModelAssembler.toCollectionModel(
+                    foodTypeDAOS
+                )
+                .add(
+                    linkTo(
+                            methodOn(ItemTypeController.class).getAll(page, size)
+                    ).withSelfRel()
+                );
     }
 
     @PostMapping("food")
     public EntityModel<String> stringEntityModel(
             FoodTypeDAO foodTypeDAO,
             BindingResult bindingResult) throws ObjectInvalid {
+        this.logger.info("-----------");
         this.logger.info("Saving new food item");
         this.logger.debug(foodTypeDAO.toString());
         if(bindingResult.hasErrors()) {
@@ -95,27 +105,19 @@ public class ItemTypeController {
     public EntityModel<String> delete(
             @PathVariable Long id
     ) throws ObjectNotFound {
+        this.logger.info("-----------");
         this.logger.info("Deleting food item type id " + id.toString());
+        this.foodTypeService.checkIfFoodTypeExists(id);
         Optional<FoodTypeDAO> foodTypeDAO = this.foodTypeRepository.findById(id);
-        if(foodTypeDAO.isEmpty()) {
-            this.logger.debug("Food type does not exist");
-            throw new ObjectNotFound(
-                    id,
-                    linkTo(
-                            methodOn(ItemTypeController.class).delete(id)
-                    ).withSelfRel()
-            );
-        }
-        else{
-            this.foodTypeRepository.delete(foodTypeDAO.get());
-            return new ConfirmationTemplate(
-                    ConfirmationTemplate.Token.DELETE,
-                    FoodTypeDAO.class.getName(),
-                    linkTo(
-                            methodOn(ItemTypeController.class).delete(id)
-                    ).withSelfRel()
-            ).getEntityModel();
-        }
+        this.foodTypeRepository.delete(foodTypeDAO.get());
+        return new ConfirmationTemplate(
+                ConfirmationTemplate.Token.DELETE,
+                FoodTypeDAO.class.getName(),
+                linkTo(
+                        methodOn(ItemTypeController.class).delete(id)
+                ).withSelfRel()
+        ).getEntityModel();
+
     }
 
     @PutMapping("/food/{id}")
@@ -123,6 +125,7 @@ public class ItemTypeController {
             @ModelAttribute @Validated FoodTypeDAO foodTypeDAO,
             BindingResult bindingResult
     ) throws ObjectInvalid, ObjectNotFound {
+        this.logger.info("-----------");
         this.logger.info("Updating food item type");
         this.logger.debug(foodTypeDAO.toString());
         if(bindingResult.hasErrors()) {
@@ -136,16 +139,8 @@ public class ItemTypeController {
                     ).withSelfRel()
             );
         }
+        this.foodTypeService.checkIfFoodTypeExists(foodTypeDAO.getId());
         Optional<FoodTypeDAO> oldFoodTypeDAO = this.foodTypeRepository.findById(foodTypeDAO.getId());
-        if(oldFoodTypeDAO.isEmpty()) {
-            this.logger.debug("Updating type does not exist");
-            throw new ObjectNotFound(
-                    foodTypeDAO.getId(),
-                    linkTo(
-                            methodOn(ItemTypeController.class).put(foodTypeDAO, bindingResult)
-                    ).withSelfRel()
-            );
-        }
         this.foodTypeRepository.save(foodTypeDAO);
         return new ConfirmationTemplate(
                 ConfirmationTemplate.Token.PUT,

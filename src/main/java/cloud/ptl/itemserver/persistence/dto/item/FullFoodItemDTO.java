@@ -2,6 +2,7 @@ package cloud.ptl.itemserver.persistence.dto.item;
 
 import cloud.ptl.itemserver.persistence.dao.address.AddressDAO;
 import cloud.ptl.itemserver.persistence.dao.item.food.FoodTypeDAO;
+import cloud.ptl.itemserver.persistence.dto.address.FullAddressDTO;
 import lombok.*;
 import org.springframework.hateoas.RepresentationModel;
 import org.springframework.hateoas.server.core.Relation;
@@ -20,7 +21,7 @@ public class FullFoodItemDTO extends RepresentationModel<FullFoodItemDTO> {
     private String name;
     private String description;
     private LocalDate dateAdded;
-    private AddressDAO addressDAO;
+    private FullAddressDTO addressDTO;
     private FoodTypeDAO type;
     private LocalDate dueDate;
 }

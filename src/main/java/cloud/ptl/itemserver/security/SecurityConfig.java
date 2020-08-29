@@ -14,6 +14,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository;
 
 @Configuration
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
@@ -31,8 +33,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         httpSecurityHttpBasicConfigurer.realmName("item-server")
                 )
                 .formLogin().disable()
-                .csrf().disable()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+                .csrf().disable();
         // allow CORS pre-flight OPTIONS requests
         http.cors();
     }

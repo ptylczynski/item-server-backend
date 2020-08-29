@@ -13,10 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
 
@@ -53,8 +50,45 @@ public class UserController {
                 );
     }
 
+    @GetMapping("/info/byUsername")
+    public UserCensoredDTO infoByUsername(
+            @RequestParam("username") String username
+    ) throws ObjectNotFound {
+        this.logger.info("-----------");
+        this.logger.info("Getting info about user");
+        this.logger.debug("username=" + username);
+        this.userService.checkIfUserExist(username);
+        Optional<UserDAO> userDAO = this.userRepository.findByUsername(username);
+        return this.userCensoredModelAssembler
+                .toModel(userDAO.get())
+                .add(
+                        WebMvcLinkBuilder.linkTo(
+                                WebMvcLinkBuilder.methodOn(UserController.class).infoByUsername(username)
+                        ).withSelfRel()
+                );
+    }
+
+    @GetMapping("/info/byMail")
+    public UserCensoredDTO infoByMail(
+            @RequestParam("mail") String mail
+    ) throws ObjectNotFound {
+        this.logger.info("-----------");
+        this.logger.info("Getting info about user");
+        this.logger.debug("mail=" + mail);
+        this.userService.checkIfUserExist(mail);
+        Optional<UserDAO> userDAO = this.userRepository.findByMail(mail);
+        return this.userCensoredModelAssembler
+                .toModel(userDAO.get())
+                .add(
+                        WebMvcLinkBuilder.linkTo(
+                                WebMvcLinkBuilder.methodOn(UserController.class).infoByMail(mail)
+                        ).withSelfRel()
+                );
+    }
+
     @GetMapping("/all")
     public CollectionModel<UserCensoredDTO> getAll(){
+        this.logger.info("-----------");
         Iterable<UserDAO> users = this.userRepository.findBy(UserDAO.class);
         return this.userCensoredModelAssembler
                 .toCollectionModel(users)

@@ -55,6 +55,7 @@ public class AddressController {
 
     @GetMapping("/{id}")
     FullAddressDTO getFull(@PathVariable("id") Long id) throws ObjectNotFound {
+        this.logger.info("-----------");
         this.logger.info("Getting addrss id: " + id.toString());
         Optional<AddressDAO> addressDAO = this.addressRepository.findById(id);
         this.addressService.checkIfAddressExists(id);
@@ -70,6 +71,7 @@ public class AddressController {
             @RequestParam(defaultValue = "0") Integer page,
             @RequestParam(defaultValue = "10") Integer size
     ){
+        this.logger.info("-----------");
         this.logger.info("Getting all addresses");
         Page<AddressDAO> addressDAOPage = addressRepository.findAll(
                 PageRequest.of(page, size)
@@ -87,6 +89,7 @@ public class AddressController {
     public CollectionModel<Long> getLocators(
             @PathVariable Long id
     ) throws ObjectNotFound {
+        this.logger.info("-----------");
         this.logger.info("Fetching locators of id: " + id);
         Optional<AddressDAO> addressDAO = this.addressRepository.findById(id, AddressDAO.class);
         this.addressService.checkIfAddressExists(id);
@@ -106,6 +109,7 @@ public class AddressController {
     EntityModel<String> stringEntityModel(
             AddressDAO addressDAO,
             BindingResult bindingResult) throws AddressInvalid, ObjectInvalid {
+        this.logger.info("-----------");
         this.logger.info("Saving new address");
         this.logger.debug(addressDAO.toString());
         if(bindingResult.hasErrors()) {
@@ -130,6 +134,7 @@ public class AddressController {
     public EntityModel<String> delete(
             @PathVariable Long id
     ) throws ObjectNotFound {
+        this.logger.info("-----------");
         this.logger.info("Deleting address");
         this.logger.debug("id is " + id.toString());
             Optional<AddressDAO> addressDAO = this.addressRepository.findById(id);
@@ -150,6 +155,7 @@ public class AddressController {
             @ModelAttribute AddressDAO addressDAO,
             BindingResult bindingResult
     ) throws ObjectInvalid, ObjectNotFound {
+        this.logger.info("-----------");
         this.logger.info("Updateing address");
         this.logger.debug(addressDAO.toString());
         if(bindingResult.hasErrors()) {
@@ -171,11 +177,12 @@ public class AddressController {
         ).getEntityModel();
     }
 
-    @PatchMapping("check-in/{id}")
+    @PatchMapping("/check-in/{id}")
     public EntityModel<String> checkIn(
             @PathVariable("id") Long addressId,
             @RequestParam("user_id") Long userId
     ) throws ObjectNotFound {
+        this.logger.info("-----------");
         this.logger.info("Making check in");
         this.logger.debug("addressID=" + addressId + " userID=" + userId);
         this.addressService.checkIfAddressExists(addressId);
@@ -198,6 +205,7 @@ public class AddressController {
     public EntityModel<String> checkOut(
             @PathVariable("id") Long userId
     ) throws ObjectNotFound {
+        this.logger.info("-----------");
         this.logger.info("checking out user");
         this.logger.debug("userId=" + userId);
         this.userService.checkIfUserExist(userId);
