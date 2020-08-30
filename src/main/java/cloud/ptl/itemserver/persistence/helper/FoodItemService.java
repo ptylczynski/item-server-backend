@@ -24,7 +24,7 @@ public class FoodItemService {
         if(!this.foodItemRepository.existsById(id)){
             this.logger.debug("Item does not exist");
             throw new ObjectNotFound(
-                    this.getClass().getCanonicalName(),
+                    FoodItemDAO.class.getCanonicalName(),
                     WebMvcLinkBuilder.linkTo(FoodItemController.class).withSelfRel()
             );
         }

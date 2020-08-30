@@ -17,15 +17,16 @@ public class UserService {
     private UserRepository userRepository;
 
     private final Logger logger = LoggerFactory.getLogger(UserService.class);
+    private final ObjectNotFound objectNotFound = new ObjectNotFound(
+            UserDAO.class.getCanonicalName(),
+            WebMvcLinkBuilder.linkTo(UserController.class).withSelfRel()
+    );
 
     public Boolean checkIfUserExist(Long id) throws ObjectNotFound {
         this.logger.info("Checking if user exists");
         if(!this.userRepository.existsById(id)){
             this.logger.debug("User does not exist");
-            throw new ObjectNotFound(
-                    this.getClass().getCanonicalName(),
-                    WebMvcLinkBuilder.linkTo(UserController.class).withSelfRel()
-            );
+            throw this.objectNotFound;
         }
         this.logger.debug("User exists");
         return true;
@@ -34,16 +35,12 @@ public class UserService {
     public Boolean checkIfUserExist(String designator) throws ObjectNotFound {
         this.logger.info("Checking if user exist");
         this.logger.debug("Designator=" + designator);
-        ObjectNotFound error = new ObjectNotFound(
-                this.getClass().getCanonicalName(),
-                WebMvcLinkBuilder.linkTo(UserController.class).withSelfRel()
-        );
         if(designator.contains("@")){
             this.logger.debug("Designator is mail");
             // designator is mail address
             if(!this.userRepository.existsByMail(designator)){
                 this.logger.debug("User not found");
-                throw error;
+                throw this.objectNotFound;
             }
         }
         else{
@@ -51,7 +48,7 @@ public class UserService {
             this.logger.debug("Designator is username");
             if(!this.userRepository.existsByUsername(designator)){
                 this.logger.debug("User not found");
-                throw error;
+                throw this.objectNotFound;
             }
         }
         this.logger.debug("User found");
