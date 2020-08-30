@@ -1,6 +1,5 @@
 package cloud.ptl.itemserver.persistence.dao.item.food;
 
-import cloud.ptl.itemserver.persistence.dao.address.AddressDAO;
 import cloud.ptl.itemserver.persistence.dao.item.generics.ItemDAO;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

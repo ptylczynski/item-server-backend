@@ -1,10 +1,9 @@
 package cloud.ptl.itemserver.error.resolver.manager;
 
-import cloud.ptl.itemserver.error.resolver.provider.DataIntegrityViolationResolverProvider;
+import cloud.ptl.itemserver.error.resolver.provider.*;
 import cloud.ptl.itemserver.templates.ErrorTemplate;
-import cloud.ptl.itemserver.error.resolver.provider.AbstractErrorResolverProvider;
-import cloud.ptl.itemserver.error.resolver.provider.ObjectInvalidResolverProvider;
-import cloud.ptl.itemserver.error.resolver.provider.ObjectNotFoundResolverProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
@@ -25,7 +24,14 @@ public class BasicErrorResolverManager extends ErrorResolverManager {
     @Autowired
     private DataIntegrityViolationResolverProvider dataIntegrityViolationResolverProvider;
 
+    @Autowired
+    private UserAlreadyAddedToBundleErrorResolverProvider userAlreadyAddedToBundleErrorResolverProvider;
+
+    @Autowired
+    private UserNotAddedToBundleResolverProvider userNotAddedToBundleResolverProvider;
+
     private ArrayList<AbstractErrorResolverProvider> providers;
+    private final Logger logger = LoggerFactory.getLogger(BasicErrorResolverManager.class);
 
     @PostConstruct
     public void init(){
@@ -33,15 +39,20 @@ public class BasicErrorResolverManager extends ErrorResolverManager {
         this.providers.add(objectInvalidResolverProvider);
         this.providers.add(objectNotFoundResolverProvider);
         this.providers.add(dataIntegrityViolationResolverProvider);
+        this.providers.add(userAlreadyAddedToBundleErrorResolverProvider);
+        this.providers.add(userNotAddedToBundleResolverProvider);
     }
 
     @Override
     public <E extends Exception> EntityModel<ErrorTemplate> resolve(E exception) {
+        this.logger.info("Matching resolver to error");
+        this.logger.debug("error: " + exception.toString());
         for(AbstractErrorResolverProvider provider : providers){
             if(provider.canResolve(exception.getClass())){
                 return provider.resolve(exception);
             }
         }
+        this.logger.debug("No resolver found");
         return EntityModel.of(
                 ErrorTemplate.builder()
                         .reason(

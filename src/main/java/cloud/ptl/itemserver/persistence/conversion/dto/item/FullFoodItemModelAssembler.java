@@ -1,9 +1,9 @@
 package cloud.ptl.itemserver.persistence.conversion.dto.item;
 
-import cloud.ptl.itemserver.persistence.conversion.dto.address.FullAddressModelAssembler;
-import cloud.ptl.itemserver.persistence.dao.address.AddressDAO;
+import cloud.ptl.itemserver.persistence.conversion.dto.address.FullBundleModelAssembler;
+import cloud.ptl.itemserver.persistence.dao.bundle.BundleDAO;
 import cloud.ptl.itemserver.persistence.dao.item.food.FoodItemDAO;
-import cloud.ptl.itemserver.persistence.dto.address.FullAddressDTO;
+import cloud.ptl.itemserver.persistence.dto.address.FullBundleDTO;
 import cloud.ptl.itemserver.persistence.dto.item.FullFoodItemDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.server.mvc.RepresentationModelAssemblerSupport;
@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 public class FullFoodItemModelAssembler extends RepresentationModelAssemblerSupport<FoodItemDAO, FullFoodItemDTO> {
 
     @Autowired
-    private FullAddressModelAssembler fullAddressModelAssembler;
+    private FullBundleModelAssembler fullBundleModelAssembler;
 
     public FullFoodItemModelAssembler() {
         super(FoodItemDAO.class, FullFoodItemDTO.class);
@@ -23,8 +23,8 @@ public class FullFoodItemModelAssembler extends RepresentationModelAssemblerSupp
     public FullFoodItemDTO toModel(FoodItemDAO entity) {
         return FullFoodItemDTO.builder()
                 .id(entity.getId())
-                .addressDTO(
-                        this.getAddressDTO(entity.getAddressDAO())
+                .fullBundleDTO(
+                        this.getFullBundleDTO(entity.getBundleDAO())
                 )
                 .dateAdded(entity.getDateAdded())
                 .dueDate(entity.getDueDate())
@@ -34,7 +34,7 @@ public class FullFoodItemModelAssembler extends RepresentationModelAssemblerSupp
                 .build();
     }
 
-    private FullAddressDTO getAddressDTO(AddressDAO addressDAO){
-        return this.fullAddressModelAssembler.toModel(addressDAO);
+    private FullBundleDTO getFullBundleDTO(BundleDAO bundleDAO){
+        return this.fullBundleModelAssembler.toModel(bundleDAO);
     }
 }

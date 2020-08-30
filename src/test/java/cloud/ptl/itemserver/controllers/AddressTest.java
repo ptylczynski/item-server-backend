@@ -1,7 +1,6 @@
 package cloud.ptl.itemserver.controllers;
 
-import cloud.ptl.itemserver.persistence.dao.address.AddressDAO;
-import cloud.ptl.itemserver.persistence.repositories.address.AddressRepository;
+import cloud.ptl.itemserver.persistence.repositories.bundle.BundleRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -11,9 +10,11 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.hamcrest.Matchers.containsString;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -24,7 +25,7 @@ public class AddressTest{
     MockMvc mockMvc;
 
     @Autowired
-    AddressRepository addressRepository;
+    BundleRepository addressRepository;
 
     @Test
     // get address does not exit

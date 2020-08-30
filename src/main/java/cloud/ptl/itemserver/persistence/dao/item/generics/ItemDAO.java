@@ -1,7 +1,7 @@
 package cloud.ptl.itemserver.persistence.dao.item.generics;
 
 import cloud.ptl.itemserver.persistence.dao.AbstractDAO;
-import cloud.ptl.itemserver.persistence.dao.address.AddressDAO;
+import cloud.ptl.itemserver.persistence.dao.bundle.BundleDAO;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -24,6 +24,6 @@ public class ItemDAO extends AbstractDAO {
     private LocalDate dateAdded;
 
     @ManyToOne
-    @JoinColumn(name = "address_fk")
-    private AddressDAO addressDAO;
+    @JoinColumn(name = "bundle_fk")
+    private BundleDAO bundleDAO;
 }

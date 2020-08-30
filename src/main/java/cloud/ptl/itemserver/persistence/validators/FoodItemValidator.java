@@ -1,9 +1,9 @@
 package cloud.ptl.itemserver.persistence.validators;
 
-import cloud.ptl.itemserver.persistence.dao.address.AddressDAO;
+import cloud.ptl.itemserver.persistence.dao.bundle.BundleDAO;
 import cloud.ptl.itemserver.persistence.dao.item.food.FoodItemDAO;
 import cloud.ptl.itemserver.persistence.dao.item.food.FoodTypeDAO;
-import cloud.ptl.itemserver.persistence.repositories.address.AddressRepository;
+import cloud.ptl.itemserver.persistence.repositories.bundle.BundleRepository;
 import cloud.ptl.itemserver.persistence.repositories.item.FoodTypeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -16,7 +16,7 @@ import java.time.LocalDate;
 public class FoodItemValidator implements Validator {
 
     @Autowired
-    private AddressRepository addressRepository;
+    private BundleRepository bundleRepository;
 
     @Autowired
     private FoodTypeRepository foodTypeRepository;
@@ -53,16 +53,16 @@ public class FoodItemValidator implements Validator {
             }
 
             // does address exist
-            AddressDAO addressDAO = foodItemDAO.getAddressDAO();
+            BundleDAO bundleDAO = foodItemDAO.getBundleDAO();
 
             // does address exist in request
-            if(addressDAO == null){
-                errors.rejectValue("addressDAO", "address.missing");
+            if(bundleDAO == null){
+                errors.rejectValue("addressDAO", "bundle.missing");
                 return;
             }
 
-            if(!addressRepository.existsById(addressDAO.getId())){
-                errors.rejectValue("addressDAO", "address.does.not.exist");
+            if(!bundleRepository.existsById(bundleDAO.getId())){
+                errors.rejectValue("bundleDAO", "bundle.does.not.exist");
             }
 
             // does food type exist

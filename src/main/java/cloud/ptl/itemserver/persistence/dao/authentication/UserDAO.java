@@ -1,18 +1,13 @@
 package cloud.ptl.itemserver.persistence.dao.authentication;
 
 import cloud.ptl.itemserver.persistence.dao.AbstractDAO;
-import cloud.ptl.itemserver.persistence.dao.address.AddressDAO;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.Builder;
+import cloud.ptl.itemserver.persistence.dao.bundle.BundleDAO;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
 import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
 import java.util.List;
-import java.util.Set;
 
 @EqualsAndHashCode(exclude = "locatorOf")
 @Entity(name = "user")
@@ -40,7 +35,7 @@ public class UserDAO extends AbstractDAO {
     private List<AuthorityDAO> authorityDAOList;
 
     @ManyToOne
-    private AddressDAO locatorOf;
+    private BundleDAO locatorOf;
 
     public User toUser(){
         return new User(

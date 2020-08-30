@@ -1,6 +1,7 @@
 package cloud.ptl.itemserver.error.resolver;
 
-import org.aspectj.bridge.IMessage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -16,7 +17,12 @@ public class BindingResultToStringTransformer {
     @Autowired
     private MessageSource messageSource;
 
+    private final Logger logger = LoggerFactory.getLogger(BindingResultToStringTransformer.class);
+
+
+
     public String transform(BindingResult bindingResult){
+        this.logger.info("Transforming binding result into string");
         for(ObjectError error : bindingResult.getAllErrors()){
             if(error.getCodes() != null) {
                 for (String code : error.getCodes()){
@@ -26,10 +32,14 @@ public class BindingResultToStringTransformer {
                             "error",
                             LocaleContextHolder.getLocale()
                     );
-                    if(!message.equals("error")) return message;
+                    if(!message.equals("error")){
+                        this.logger.debug("Resolved as: " + message);
+                        return message;
+                    }
                 }
             }
         }
+        this.logger.debug("Binding result unresolvable");
         return Arrays.toString(bindingResult.getAllErrors().toArray());
     }
 }
