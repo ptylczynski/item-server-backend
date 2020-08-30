@@ -1,4 +1,4 @@
-package cloud.ptl.itemserver.error.resolver;
+package cloud.ptl.itemserver.error.resolver.transformers;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,7 +12,7 @@ import org.springframework.validation.ObjectError;
 import java.util.Arrays;
 
 @Component
-public class BindingResultToStringTransformer {
+public class BindingResultToStringTransformer extends AbstractTransformer<BindingResult, String> {
 
     @Autowired
     private MessageSource messageSource;

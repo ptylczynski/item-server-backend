@@ -1,6 +1,7 @@
 package cloud.ptl.itemserver.error.resolver.provider;
 
 import cloud.ptl.itemserver.error.exception.missing.ObjectNotFound;
+import cloud.ptl.itemserver.error.resolver.transformers.ClassNameToStringTransformer;
 import cloud.ptl.itemserver.templates.ErrorTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,6 +16,9 @@ public class ObjectNotFoundResolverProvider extends AbstractErrorResolverProvide
 
     @Autowired
     private MessageSource messageSource;
+
+    @Autowired
+    private ClassNameToStringTransformer classNameToStringTransformer;
 
     private final Logger logger = LoggerFactory.getLogger(ObjectNotFound.class);
 
@@ -40,7 +44,9 @@ public class ObjectNotFoundResolverProvider extends AbstractErrorResolverProvide
     private String createMessage(ObjectNotFound exception){
         return this.messageSource.getMessage(
                 "object.not.found",
-                new Object[]{exception.getDiscriminator()},
+                new Object[]{
+                        this.classNameToStringTransformer.transform(exception.getObjectClass())
+                },
                 "Missing reason",
                 LocaleContextHolder.getLocale()
         );

@@ -23,7 +23,7 @@ public class UserService {
         if(!this.userRepository.existsById(id)){
             this.logger.debug("User does not exist");
             throw new ObjectNotFound(
-                    id,
+                    this.getClass().getCanonicalName(),
                     WebMvcLinkBuilder.linkTo(UserController.class).withSelfRel()
             );
         }
@@ -35,7 +35,7 @@ public class UserService {
         this.logger.info("Checking if user exist");
         this.logger.debug("Designator=" + designator);
         ObjectNotFound error = new ObjectNotFound(
-                designator,
+                this.getClass().getCanonicalName(),
                 WebMvcLinkBuilder.linkTo(UserController.class).withSelfRel()
         );
         if(designator.contains("@")){

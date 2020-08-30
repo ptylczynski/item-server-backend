@@ -23,7 +23,7 @@ public class FoodTypeService {
         if(!this.foodTypeRepository.existsById(id)){
             this.logger.debug("Food type does not exists");
             throw new ObjectNotFound(
-                    id,
+                    this.getClass().getCanonicalName(),
                     WebMvcLinkBuilder.linkTo(ItemTypeController.class).withSelfRel()
             );
         }

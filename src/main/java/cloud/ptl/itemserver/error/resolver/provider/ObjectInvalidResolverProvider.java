@@ -1,7 +1,7 @@
 package cloud.ptl.itemserver.error.resolver.provider;
 
 import cloud.ptl.itemserver.error.exception.parsing.ObjectInvalid;
-import cloud.ptl.itemserver.error.resolver.BindingResultToStringTransformer;
+import cloud.ptl.itemserver.error.resolver.transformers.BindingResultToStringTransformer;
 import cloud.ptl.itemserver.templates.ErrorTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

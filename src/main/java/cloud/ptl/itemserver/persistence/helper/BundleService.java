@@ -32,7 +32,7 @@ public class BundleService {
         if(!this.bundleRepository.existsById(id)){
             this.logger.debug("Bundle does not exist");
             throw new ObjectNotFound(
-                    id,
+                    BundleDAO.class.getCanonicalName(),
                     WebMvcLinkBuilder.linkTo(BundleController.class).withSelfRel()
             );
         }

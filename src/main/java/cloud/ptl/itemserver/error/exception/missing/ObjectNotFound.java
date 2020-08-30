@@ -9,6 +9,6 @@ import org.springframework.hateoas.Link;
 @Data
 @AllArgsConstructor
 public class ObjectNotFound extends Exception{
-    private Object discriminator;
+    private String objectClass;
     private Link link;
 }
