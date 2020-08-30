@@ -1,7 +1,7 @@
 package cloud.ptl.itemserver.error.resolver.provider;
 
 import cloud.ptl.itemserver.error.exception.validation.UserNotAddedToBundle;
-import cloud.ptl.itemserver.persistence.conversion.dto.address.FullBundleModelAssembler;
+import cloud.ptl.itemserver.persistence.conversion.dto_assembler.address.FullBundleModelAssembler;
 import cloud.ptl.itemserver.templates.ErrorTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

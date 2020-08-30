@@ -2,6 +2,7 @@ package cloud.ptl.itemserver.persistence.helper;
 
 import cloud.ptl.itemserver.controllers.UserController;
 import cloud.ptl.itemserver.error.exception.missing.ObjectNotFound;
+import cloud.ptl.itemserver.persistence.dao.authentication.UserDAO;
 import cloud.ptl.itemserver.persistence.repositories.security.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,5 +56,12 @@ public class UserService {
         }
         this.logger.debug("User found");
         return true;
+    }
+
+    public UserDAO findById(Long id) throws ObjectNotFound {
+        this.logger.info("Searching user");
+        this.logger.debug("id=" + id);
+        this.checkIfUserExist(id);
+        return this.userRepository.findById(id).get();
     }
 }

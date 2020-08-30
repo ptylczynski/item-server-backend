@@ -4,7 +4,8 @@ import cloud.ptl.itemserver.error.exception.missing.ObjectNotFound;
 import cloud.ptl.itemserver.error.exception.parsing.ObjectInvalid;
 import cloud.ptl.itemserver.error.exception.validation.BundleInvalid;
 import cloud.ptl.itemserver.error.exception.validation.UserAlreadyAddedToBundle;
-import cloud.ptl.itemserver.persistence.conversion.dto.address.FullBundleModelAssembler;
+import cloud.ptl.itemserver.error.exception.validation.UserNotAddedToBundle;
+import cloud.ptl.itemserver.persistence.conversion.dto_assembler.address.FullBundleModelAssembler;
 import cloud.ptl.itemserver.persistence.dao.authentication.UserDAO;
 import cloud.ptl.itemserver.persistence.dao.bundle.BundleDAO;
 import cloud.ptl.itemserver.persistence.dto.address.FullBundleDTO;
@@ -30,6 +31,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 // TODO move logic outside controller to helper class
+// TODO tweak error messages for API
 
 @RestController
 @RequestMapping("/bundle")
@@ -156,45 +158,81 @@ public class BundleController {
 
     @PatchMapping("/add-editor/{id}")
     public EntityModel<String> addAsEditor(
-            @PathVariable("id") BundleDAO bundleDAO,
-            @RequestParam("user_id") UserDAO userDAO
-    ) throws UserAlreadyAddedToBundle {
+            @PathVariable("id") Long bundleId,
+            @RequestParam("user_id") Long userId
+    ) throws UserAlreadyAddedToBundle, ObjectNotFound {
         this.logger.info("-----------");
         this.logger.info("Adding user as editor to bundle");
-        this.logger.debug("bundle: " + bundleDAO.toString());
-        this.logger.debug("user: " + userDAO.toString());
-        this.bundleService.checkIfUserIsAdded(bundleDAO, userDAO);
-        bundleDAO.getEditors().add(userDAO);
-        this.bundleRepository.save(bundleDAO);
+        this.logger.debug("bundle: " + bundleId.toString());
+        this.logger.debug("user: " + userId.toString());
+        this.bundleService.addUserAsEditor(userId, bundleId);
         this.logger.debug("User added");
         return new ConfirmationTemplate(
                 ConfirmationTemplate.Token.PATCH,
                 UserDAO.class.toString(),
                 linkTo(
-                        methodOn(BundleController.class).addAsEditor(bundleDAO, userDAO)
+                        methodOn(BundleController.class).addAsEditor(bundleId, userId)
                 ).withSelfRel()
         ).getEntityModel();
     }
 
     @PatchMapping("/remove-editor/{id}")
     public EntityModel<String> removeAsEditor(
-            @PathVariable("id") BundleDAO bundleDAO,
-            @RequestParam("user_id") UserDAO userDAO
-    ) throws ObjectNotFound {
+            @PathVariable("id") Long bundleId,
+            @RequestParam("user_id") Long userId
+    ) throws ObjectNotFound, UserNotAddedToBundle {
         this.logger.info("-----------");
         this.logger.info("removing user as editor of bundle");
-        this.logger.debug("user: " + userDAO.toString());
-        this.logger.debug("bundle: " + bundleDAO.toString());
-        this.bundleService.checkIfUserIsNotAdded(bundleDAO, userDAO);
-        bundleDAO.getEditors().remove(userDAO);
-        this.bundleRepository.save(bundleDAO);
+        this.logger.debug("user: " + userId.toString());
+        this.logger.debug("bundle: " + bundleId.toString());
+        this.bundleService.removeUserAsEditor(userId, bundleId);
         this.logger.debug("User removed");
-        FullBundleDTO dto = this.fullBundleModelAssembler.toModel(bundleDAO);
         return new ConfirmationTemplate(
                 ConfirmationTemplate.Token.PATCH,
                 UserDAO.class.toString(),
                 linkTo(
-                        methodOn(BundleController.class).removeAsEditor(bundleDAO, userDAO)
+                        methodOn(BundleController.class).removeAsEditor(bundleId, userId)
+                ).withSelfRel()
+        ).getEntityModel();
+    }
+
+
+    @PatchMapping("/add-viewer/{id}")
+    public EntityModel<String> addAsViewer(
+            @PathVariable("id") Long bundleId,
+            @RequestParam("user_id") Long userId
+    ) throws ObjectNotFound, UserAlreadyAddedToBundle {
+        this.logger.info("-----------");
+        this.logger.info("adding user as viewer of bundle");
+        this.logger.debug("user: " + userId.toString());
+        this.logger.debug("bundle: " + bundleId.toString());
+        this.bundleService.addUserAsViewer(userId, bundleId);
+        this.logger.debug("User added");
+        return new ConfirmationTemplate(
+                ConfirmationTemplate.Token.PATCH,
+                UserDAO.class.toString(),
+                linkTo(
+                        methodOn(BundleController.class).addAsViewer(bundleId, userId)
+                ).withSelfRel()
+        ).getEntityModel();
+    }
+
+    @PatchMapping("/remove-viewer/{id}")
+    public EntityModel<String> removeAsViewer(
+            @PathVariable("id") Long bundleId,
+            @RequestParam("user_id") Long userId
+    ) throws ObjectNotFound, UserNotAddedToBundle {
+        this.logger.info("-----------");
+        this.logger.info("removing user as viewer of bundle");
+        this.logger.debug("user: " + userId.toString());
+        this.logger.debug("bundle: " + bundleId.toString());
+        this.bundleService.removeUserAsViewer(userId, bundleId);
+        this.logger.debug("User removed");
+        return new ConfirmationTemplate(
+                ConfirmationTemplate.Token.PATCH,
+                UserDAO.class.toString(),
+                linkTo(
+                        methodOn(BundleController.class).removeAsViewer(bundleId, userId)
                 ).withSelfRel()
         ).getEntityModel();
     }

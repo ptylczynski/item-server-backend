@@ -2,6 +2,7 @@ package cloud.ptl.itemserver.persistence.helper;
 
 import cloud.ptl.itemserver.controllers.ItemTypeController;
 import cloud.ptl.itemserver.error.exception.missing.ObjectNotFound;
+import cloud.ptl.itemserver.persistence.dao.item.food.FoodTypeDAO;
 import cloud.ptl.itemserver.persistence.repositories.item.FoodTypeRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,5 +29,12 @@ public class FoodTypeService {
         }
         this.logger.debug("food type exists");
         return true;
+    }
+
+    public FoodTypeDAO getById(Long id) throws ObjectNotFound {
+        this.logger.info("Searching food type");
+        this.logger.debug("id=" + id);
+        this.checkIfFoodTypeExists(id);
+        return this.foodTypeRepository.findById(id).get();
     }
 }

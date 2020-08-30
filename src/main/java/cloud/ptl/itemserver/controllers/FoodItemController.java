@@ -1,9 +1,9 @@
 package cloud.ptl.itemserver.controllers;
 
-import cloud.ptl.itemserver.error.exception.parsing.ObjectInvalid;
 import cloud.ptl.itemserver.error.exception.missing.ObjectNotFound;
+import cloud.ptl.itemserver.error.exception.parsing.ObjectInvalid;
 import cloud.ptl.itemserver.error.resolver.manager.BasicErrorResolverManager;
-import cloud.ptl.itemserver.persistence.conversion.dto.item.FullFoodItemModelAssembler;
+import cloud.ptl.itemserver.persistence.conversion.dto_assembler.item.FullFoodItemModelAssembler;
 import cloud.ptl.itemserver.persistence.dao.item.food.FoodItemDAO;
 import cloud.ptl.itemserver.persistence.dto.item.FullFoodItemDTO;
 import cloud.ptl.itemserver.persistence.helper.FoodItemService;
@@ -53,7 +53,7 @@ public class FoodItemController {
         webDataBinder.addValidators(foodItemValidator);
     }
 
-    private Logger logger = LoggerFactory.getLogger(FoodItemController.class);
+    private final Logger logger = LoggerFactory.getLogger(FoodItemController.class);
 
     @GetMapping("/number")
     public EntityModel<Long> getNumber(){

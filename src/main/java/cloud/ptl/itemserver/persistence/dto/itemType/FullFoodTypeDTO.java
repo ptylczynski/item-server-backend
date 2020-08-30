@@ -12,7 +12,7 @@ import org.springframework.hateoas.server.core.Relation;
 @NoArgsConstructor
 @AllArgsConstructor
 @Relation(itemRelation = "type", collectionRelation = "types")
-public class FullItemTypeDTO extends RepresentationModel<FullItemTypeDTO> {
+public class FullFoodTypeDTO extends RepresentationModel<FullFoodTypeDTO> {
     private long id;
     private String name;
     private String description;

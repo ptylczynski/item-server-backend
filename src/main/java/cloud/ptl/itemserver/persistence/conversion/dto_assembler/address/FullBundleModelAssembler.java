@@ -1,10 +1,13 @@
-package cloud.ptl.itemserver.persistence.conversion.dto.address;
+package cloud.ptl.itemserver.persistence.conversion.dto_assembler.address;
 
-import cloud.ptl.itemserver.persistence.conversion.dto.user.UserCensoredModelAssembler;
+import cloud.ptl.itemserver.error.exception.missing.ObjectNotFound;
+import cloud.ptl.itemserver.persistence.conversion.dto_assembler.user.UserCensoredModelAssembler;
 import cloud.ptl.itemserver.persistence.dao.authentication.UserDAO;
 import cloud.ptl.itemserver.persistence.dao.bundle.BundleDAO;
 import cloud.ptl.itemserver.persistence.dto.address.FullBundleDTO;
 import cloud.ptl.itemserver.persistence.dto.user.UserCensoredDTO;
+import cloud.ptl.itemserver.persistence.helper.BundleService;
+import cloud.ptl.itemserver.persistence.repositories.bundle.BundleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.server.mvc.RepresentationModelAssemblerSupport;
 import org.springframework.stereotype.Component;
@@ -17,6 +20,12 @@ public class FullBundleModelAssembler extends RepresentationModelAssemblerSuppor
 
     @Autowired
     private UserCensoredModelAssembler userCensoredModelAssembler;
+
+    @Autowired
+    private BundleRepository bundleRepository;
+
+    @Autowired
+    private BundleService bundleService;
 
     public FullBundleModelAssembler() {
         super(BundleDAO.class, FullBundleDTO.class);
@@ -31,6 +40,12 @@ public class FullBundleModelAssembler extends RepresentationModelAssemblerSuppor
                 .viewers(this.getUsers(entity.getViewers()))
                 .owner(this.getUser(entity.getOwner()))
                 .build();
+    }
+
+    public FullBundleDTO toModel(Long id) throws ObjectNotFound {
+        return this.toModel(
+                this.bundleService.findById(id)
+        );
     }
 
     private Set<UserCensoredDTO> getUsers(Set<UserDAO> users){

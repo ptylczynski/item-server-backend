@@ -1,7 +1,7 @@
 package cloud.ptl.itemserver.controllers;
 
 import cloud.ptl.itemserver.error.exception.missing.ObjectNotFound;
-import cloud.ptl.itemserver.persistence.conversion.dto.user.UserCensoredModelAssembler;
+import cloud.ptl.itemserver.persistence.conversion.dto_assembler.user.UserCensoredModelAssembler;
 import cloud.ptl.itemserver.persistence.dao.authentication.UserDAO;
 import cloud.ptl.itemserver.persistence.dto.user.UserCensoredDTO;
 import cloud.ptl.itemserver.persistence.helper.UserService;
@@ -11,7 +11,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
-import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.web.bind.annotation.*;
 

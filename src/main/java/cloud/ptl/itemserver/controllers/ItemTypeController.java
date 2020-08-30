@@ -1,12 +1,12 @@
 package cloud.ptl.itemserver.controllers;
 
 
-import cloud.ptl.itemserver.error.exception.parsing.ObjectInvalid;
 import cloud.ptl.itemserver.error.exception.missing.ObjectNotFound;
+import cloud.ptl.itemserver.error.exception.parsing.ObjectInvalid;
 import cloud.ptl.itemserver.error.resolver.manager.BasicErrorResolverManager;
-import cloud.ptl.itemserver.persistence.conversion.dto.itemType.FullItemTypeModelAssembler;
+import cloud.ptl.itemserver.persistence.conversion.dto_assembler.itemType.FullFoodTypeModelAssembler;
 import cloud.ptl.itemserver.persistence.dao.item.food.FoodTypeDAO;
-import cloud.ptl.itemserver.persistence.dto.itemType.FullItemTypeDTO;
+import cloud.ptl.itemserver.persistence.dto.itemType.FullFoodTypeDTO;
 import cloud.ptl.itemserver.persistence.helper.FoodTypeService;
 import cloud.ptl.itemserver.persistence.repositories.item.FoodTypeRepository;
 import cloud.ptl.itemserver.templates.ConfirmationTemplate;
@@ -37,7 +37,7 @@ public class ItemTypeController {
     private BasicErrorResolverManager basicErrorResolverManager;
 
     @Autowired
-    private FullItemTypeModelAssembler fullItemTypeModelAssembler;
+    private FullFoodTypeModelAssembler fullItemTypeModelAssembler;
 
     @Autowired
     private FoodTypeService foodTypeService;
@@ -45,7 +45,7 @@ public class ItemTypeController {
     private final Logger logger = LoggerFactory.getLogger(ItemTypeController.class);
 
     @GetMapping("/food/{id}")
-    public FullItemTypeDTO foodTypeDAOEntityModel(
+    public FullFoodTypeDTO foodTypeDAOEntityModel(
             @PathVariable Long id) throws ObjectNotFound {
         this.logger.info("-----------");
         this.logger.info("Getting food item type id" + id.toString());
@@ -60,7 +60,7 @@ public class ItemTypeController {
     }
 
     @GetMapping("/food/all")
-    public CollectionModel<FullItemTypeDTO> getAll(
+    public CollectionModel<FullFoodTypeDTO> getAll(
             @RequestParam(defaultValue = "0") Integer page,
             @RequestParam(defaultValue = "10") Integer size
     ){

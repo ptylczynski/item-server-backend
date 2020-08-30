@@ -31,4 +31,11 @@ public class FoodItemService {
         this.logger.debug("Item exists");
         return true;
     }
+
+    public FoodItemDAO findById(Long id) throws ObjectNotFound {
+        this.logger.info("Searching food item");
+        this.logger.debug("id=" + id);
+        this.checkIfFoodItemExists(id);
+        return this.foodItemRepository.findById(id).get();
+    }
 }
