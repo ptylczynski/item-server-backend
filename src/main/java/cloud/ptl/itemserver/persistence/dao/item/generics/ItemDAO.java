@@ -1,24 +1,23 @@
 package cloud.ptl.itemserver.persistence.dao.item.generics;
 
-import cloud.ptl.itemserver.persistence.dao.AbstractDAO;
+import cloud.ptl.itemserver.persistence.helper.LongIndexed;
 import cloud.ptl.itemserver.persistence.dao.bundle.BundleDAO;
+import cloud.ptl.itemserver.persistence.helper.WithSecurityIdentity;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
 import java.time.LocalDate;
 
-@EqualsAndHashCode(callSuper = true)
 @Data
 @Entity(name = "item")
 @Inheritance(strategy = InheritanceType.JOINED)
-public class ItemDAO extends AbstractDAO {
+public class ItemDAO implements LongIndexed, WithSecurityIdentity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
-
+    private Long id;
     private String name;
     private String description;
+    private String securityHash;
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate dateAdded;

@@ -6,7 +6,7 @@ import cloud.ptl.itemserver.persistence.dao.bundle.BundleDAO;
 import cloud.ptl.itemserver.persistence.dao.item.food.FoodItemDAO;
 import cloud.ptl.itemserver.persistence.dto.address.FullBundleDTO;
 import cloud.ptl.itemserver.persistence.dto.item.FullFoodItemDTO;
-import cloud.ptl.itemserver.persistence.helper.FoodItemService;
+import cloud.ptl.itemserver.persistence.helper.service.FoodItemService;
 import cloud.ptl.itemserver.persistence.repositories.item.FoodItemRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.server.mvc.RepresentationModelAssemblerSupport;

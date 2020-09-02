@@ -1,5 +1,6 @@
 package cloud.ptl.itemserver.persistence.dto.user;
 
+import cloud.ptl.itemserver.persistence.helper.LongIndexed;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,7 +13,8 @@ import org.springframework.hateoas.server.core.Relation;
 @Builder
 @AllArgsConstructor
 @Relation(itemRelation = "user", collectionRelation = "users")
-public class UserCensoredDTO extends RepresentationModel<UserCensoredDTO> {
+public class UserCensoredDTO extends RepresentationModel<UserCensoredDTO>
+        implements LongIndexed {
     private Long id;
     private String username;
     private String displayName;

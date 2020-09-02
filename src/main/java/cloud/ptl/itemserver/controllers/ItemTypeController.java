@@ -7,7 +7,7 @@ import cloud.ptl.itemserver.error.resolver.manager.BasicErrorResolverManager;
 import cloud.ptl.itemserver.persistence.conversion.dto_assembler.itemType.FullFoodTypeModelAssembler;
 import cloud.ptl.itemserver.persistence.dao.item.food.FoodTypeDAO;
 import cloud.ptl.itemserver.persistence.dto.itemType.FullFoodTypeDTO;
-import cloud.ptl.itemserver.persistence.helper.FoodTypeService;
+import cloud.ptl.itemserver.persistence.helper.service.FoodTypeService;
 import cloud.ptl.itemserver.persistence.repositories.item.FoodTypeRepository;
 import cloud.ptl.itemserver.templates.ConfirmationTemplate;
 import org.slf4j.Logger;

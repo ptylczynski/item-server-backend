@@ -6,7 +6,7 @@ import cloud.ptl.itemserver.persistence.dao.authentication.UserDAO;
 import cloud.ptl.itemserver.persistence.dao.bundle.BundleDAO;
 import cloud.ptl.itemserver.persistence.dto.address.FullBundleDTO;
 import cloud.ptl.itemserver.persistence.dto.user.UserCensoredDTO;
-import cloud.ptl.itemserver.persistence.helper.BundleService;
+import cloud.ptl.itemserver.persistence.helper.service.BundleService;
 import cloud.ptl.itemserver.persistence.repositories.bundle.BundleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.server.mvc.RepresentationModelAssemblerSupport;

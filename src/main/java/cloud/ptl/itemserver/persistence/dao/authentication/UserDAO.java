@@ -1,7 +1,8 @@
 package cloud.ptl.itemserver.persistence.dao.authentication;
 
-import cloud.ptl.itemserver.persistence.dao.AbstractDAO;
+import cloud.ptl.itemserver.persistence.helper.LongIndexed;
 import cloud.ptl.itemserver.persistence.dao.bundle.BundleDAO;
+import cloud.ptl.itemserver.persistence.helper.WithSecurityIdentity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.security.core.userdetails.User;
@@ -13,10 +14,9 @@ import java.util.List;
 @Entity(name = "user")
 @Table(name = "user")
 @Data
-public class UserDAO extends AbstractDAO {
+public class UserDAO implements LongIndexed, WithSecurityIdentity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     private String username;
     private String displayName;
     private String password;
@@ -25,6 +25,7 @@ public class UserDAO extends AbstractDAO {
     private Boolean accountNotExpired;
     private Boolean credentialsNotExpired;
     private Boolean accountNotLocked;
+    private String securityHash;
 
     @ManyToMany
     @JoinTable(

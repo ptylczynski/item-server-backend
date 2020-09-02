@@ -52,22 +52,4 @@ public class ItemServerApplication implements WebMvcConfigurer {
         acceptHeaderLocaleResolver.setDefaultLocale(Locale.ENGLISH);
         return acceptHeaderLocaleResolver;
     }
-
-//    @Bean
-//    public LocaleResolver localeResolver(){
-//        CookieLocaleResolver cookieLocaleResolver =
-//                new CookieLocaleResolver();
-//        cookieLocaleResolver.setCookieName("lang");
-//        cookieLocaleResolver.setDefaultLocale(Locale.ENGLISH);
-//        return cookieLocaleResolver;
-//    }
-
-//    @Bean
-//    public LocaleChangeInterceptor localeChangeInterceptor(){
-//        LocaleChangeInterceptor localeChangeInterceptor =
-//                new LocaleChangeInterceptor();
-//        localeChangeInterceptor.setParamName("lang");
-//        return localeChangeInterceptor;
-//    }
-
 }

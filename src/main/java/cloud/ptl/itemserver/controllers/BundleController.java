@@ -7,10 +7,13 @@ import cloud.ptl.itemserver.error.exception.validation.UserAlreadyAddedToBundle;
 import cloud.ptl.itemserver.error.exception.validation.UserNotAddedToBundle;
 import cloud.ptl.itemserver.persistence.conversion.dto_assembler.address.FullBundleModelAssembler;
 import cloud.ptl.itemserver.persistence.dao.authentication.UserDAO;
+import cloud.ptl.itemserver.persistence.dao.authorization.CompoundPermission;
 import cloud.ptl.itemserver.persistence.dao.bundle.BundleDAO;
 import cloud.ptl.itemserver.persistence.dto.address.FullBundleDTO;
-import cloud.ptl.itemserver.persistence.helper.BundleService;
-import cloud.ptl.itemserver.persistence.helper.UserService;
+import cloud.ptl.itemserver.persistence.helper.service.BundleService;
+import cloud.ptl.itemserver.persistence.helper.service.SecurityService;
+import cloud.ptl.itemserver.persistence.helper.service.UserService;
+import cloud.ptl.itemserver.persistence.helper.token.PermissionToken;
 import cloud.ptl.itemserver.persistence.repositories.bundle.BundleRepository;
 import cloud.ptl.itemserver.persistence.repositories.security.UserRepository;
 import cloud.ptl.itemserver.templates.ConfirmationTemplate;
@@ -22,6 +25,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
+import org.springframework.security.access.prepost.PostAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -53,7 +59,11 @@ public class BundleController {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private SecurityService securityService;
+
     @GetMapping("/{id}")
+    @PostAuthorize("hasPermission(returnObject, 'editor')")
     FullBundleDTO getFull(@PathVariable("id") Long id) throws ObjectNotFound {
         this.logger.info("-----------");
         this.logger.info("Getting bundle with id: " + id.toString());
@@ -165,7 +175,11 @@ public class BundleController {
         this.logger.info("Adding user as editor to bundle");
         this.logger.debug("bundle: " + bundleId.toString());
         this.logger.debug("user: " + userId.toString());
-        this.bundleService.addUserAsEditor(userId, bundleId);
+        FullBundleDTO fullBundleDTO =
+                this.fullBundleModelAssembler.toModel(
+                        this.bundleRepository.findById(bundleId).get()
+                );
+
         this.logger.debug("User added");
         return new ConfirmationTemplate(
                 ConfirmationTemplate.Token.PATCH,

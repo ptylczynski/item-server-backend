@@ -1,4 +1,4 @@
-package cloud.ptl.itemserver.persistence.helper;
+package cloud.ptl.itemserver.persistence.helper.service;
 
 import cloud.ptl.itemserver.controllers.BundleController;
 import cloud.ptl.itemserver.error.exception.missing.ObjectNotFound;

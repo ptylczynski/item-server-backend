@@ -3,7 +3,7 @@ package cloud.ptl.itemserver.persistence.conversion.dto_assembler.itemType;
 import cloud.ptl.itemserver.error.exception.missing.ObjectNotFound;
 import cloud.ptl.itemserver.persistence.dao.item.generics.ItemTypeDAO;
 import cloud.ptl.itemserver.persistence.dto.itemType.FullFoodTypeDTO;
-import cloud.ptl.itemserver.persistence.helper.FoodTypeService;
+import cloud.ptl.itemserver.persistence.helper.service.FoodTypeService;
 import cloud.ptl.itemserver.persistence.repositories.item.FoodTypeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.server.mvc.RepresentationModelAssemblerSupport;

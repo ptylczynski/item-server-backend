@@ -6,7 +6,7 @@ import cloud.ptl.itemserver.error.resolver.manager.BasicErrorResolverManager;
 import cloud.ptl.itemserver.persistence.conversion.dto_assembler.item.FullFoodItemModelAssembler;
 import cloud.ptl.itemserver.persistence.dao.item.food.FoodItemDAO;
 import cloud.ptl.itemserver.persistence.dto.item.FullFoodItemDTO;
-import cloud.ptl.itemserver.persistence.helper.FoodItemService;
+import cloud.ptl.itemserver.persistence.helper.service.FoodItemService;
 import cloud.ptl.itemserver.persistence.repositories.item.FoodItemRepository;
 import cloud.ptl.itemserver.persistence.validators.FoodItemValidator;
 import cloud.ptl.itemserver.templates.ConfirmationTemplate;

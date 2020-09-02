@@ -5,7 +5,7 @@ import cloud.ptl.itemserver.error.exception.parsing.ObjectUnformatable;
 import cloud.ptl.itemserver.persistence.conversion.dto_assembler.user.UserCensoredModelAssembler;
 import cloud.ptl.itemserver.persistence.dao.authentication.UserDAO;
 import cloud.ptl.itemserver.persistence.dto.user.UserCensoredDTO;
-import cloud.ptl.itemserver.persistence.helper.UserService;
+import cloud.ptl.itemserver.persistence.helper.service.UserService;
 import cloud.ptl.itemserver.persistence.repositories.security.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

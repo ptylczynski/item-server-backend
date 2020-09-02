@@ -3,7 +3,7 @@ package cloud.ptl.itemserver.persistence.conversion.dto_assembler.user;
 import cloud.ptl.itemserver.error.exception.missing.ObjectNotFound;
 import cloud.ptl.itemserver.persistence.dao.authentication.UserDAO;
 import cloud.ptl.itemserver.persistence.dto.user.UserCensoredDTO;
-import cloud.ptl.itemserver.persistence.helper.UserService;
+import cloud.ptl.itemserver.persistence.helper.service.UserService;
 import cloud.ptl.itemserver.persistence.projections.userDAO.UserCensored;
 import cloud.ptl.itemserver.persistence.repositories.security.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;

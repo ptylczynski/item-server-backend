@@ -1,5 +1,6 @@
 package cloud.ptl.itemserver.persistence.dto.itemType;
 
+import cloud.ptl.itemserver.persistence.helper.LongIndexed;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,8 +13,9 @@ import org.springframework.hateoas.server.core.Relation;
 @NoArgsConstructor
 @AllArgsConstructor
 @Relation(itemRelation = "type", collectionRelation = "types")
-public class FullFoodTypeDTO extends RepresentationModel<FullFoodTypeDTO> {
-    private long id;
+public class FullFoodTypeDTO extends RepresentationModel<FullFoodTypeDTO>
+        implements LongIndexed {
+    private Long id;
     private String name;
     private String description;
 }
