@@ -39,6 +39,7 @@ public class FullBundleModelAssembler extends RepresentationModelAssemblerSuppor
                 .editors(this.getUsers(entity.getEditors()))
                 .viewers(this.getUsers(entity.getViewers()))
                 .owner(this.getUser(entity.getOwner()))
+                .securityHash(entity.getSecurityHash())
                 .build();
     }
 

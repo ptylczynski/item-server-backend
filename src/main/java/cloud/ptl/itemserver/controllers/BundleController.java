@@ -13,7 +13,6 @@ import cloud.ptl.itemserver.persistence.dto.address.FullBundleDTO;
 import cloud.ptl.itemserver.persistence.helper.service.BundleService;
 import cloud.ptl.itemserver.persistence.helper.service.SecurityService;
 import cloud.ptl.itemserver.persistence.helper.service.UserService;
-import cloud.ptl.itemserver.persistence.helper.token.PermissionToken;
 import cloud.ptl.itemserver.persistence.repositories.bundle.BundleRepository;
 import cloud.ptl.itemserver.persistence.repositories.security.UserRepository;
 import cloud.ptl.itemserver.templates.ConfirmationTemplate;
@@ -26,11 +25,10 @@ import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.security.access.prepost.PostAuthorize;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.NoSuchAlgorithmException;
 import java.util.Optional;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
@@ -98,7 +96,7 @@ public class BundleController {
     @PostMapping("")
     EntityModel<String> stringEntityModel(
             BundleDAO bundleDAO,
-            BindingResult bindingResult) throws BundleInvalid, ObjectInvalid {
+            BindingResult bindingResult) throws BundleInvalid, ObjectInvalid, NoSuchAlgorithmException {
         this.logger.info("-----------");
         this.logger.info("Saving new bundle");
         this.logger.debug(bundleDAO.toString());
@@ -110,6 +108,7 @@ public class BundleController {
                     WebMvcLinkBuilder.linkTo(BundleController.class).withSelfRel()
             );
         }
+        this.securityService.setSecurityHash(bundleDAO);
         this.logger.debug("Bundle saved");
         bundleRepository.save(bundleDAO);
         return new ConfirmationTemplate(
@@ -170,16 +169,20 @@ public class BundleController {
     public EntityModel<String> addAsEditor(
             @PathVariable("id") Long bundleId,
             @RequestParam("user_id") Long userId
-    ) throws UserAlreadyAddedToBundle, ObjectNotFound {
+    ) throws ObjectNotFound {
         this.logger.info("-----------");
         this.logger.info("Adding user as editor to bundle");
         this.logger.debug("bundle: " + bundleId.toString());
         this.logger.debug("user: " + userId.toString());
         FullBundleDTO fullBundleDTO =
                 this.fullBundleModelAssembler.toModel(
-                        this.bundleRepository.findById(bundleId).get()
+                        this.bundleService.findById(bundleId)
                 );
-
+        this.securityService.grantPermission(
+                fullBundleDTO,
+                CompoundPermission.EDITOR,
+                this.userService.findById(userId)
+        );
         this.logger.debug("User added");
         return new ConfirmationTemplate(
                 ConfirmationTemplate.Token.PATCH,

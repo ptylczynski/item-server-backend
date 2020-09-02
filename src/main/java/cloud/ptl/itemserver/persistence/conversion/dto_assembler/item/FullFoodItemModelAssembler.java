@@ -40,6 +40,7 @@ public class FullFoodItemModelAssembler extends RepresentationModelAssemblerSupp
                 .description(entity.getDescription())
                 .name(entity.getName())
                 .type(entity.getType())
+                .securityHash(entity.getSecurityHash())
                 .build();
     }
 

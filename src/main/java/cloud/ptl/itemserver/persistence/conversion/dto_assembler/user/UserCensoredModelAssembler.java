@@ -30,6 +30,7 @@ public class UserCensoredModelAssembler extends RepresentationModelAssemblerSupp
                 .id(entity.getId())
                 .mail(entity.getMail())
                 .username(entity.getUsername())
+                .securityHash(entity.getSecurityHash())
                 .build();
     }
 
@@ -45,6 +46,7 @@ public class UserCensoredModelAssembler extends RepresentationModelAssemblerSupp
                 .mail(entity.getMail())
                 .id(entity.getId())
                 .displayName(entity.getDisplayName())
+                .securityHash(entity.getSecurityHash())
                 .build();
     }
 }
