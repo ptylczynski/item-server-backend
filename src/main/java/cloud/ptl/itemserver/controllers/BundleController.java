@@ -10,11 +10,11 @@ import cloud.ptl.itemserver.persistence.dao.authentication.UserDAO;
 import cloud.ptl.itemserver.persistence.dao.authorization.CompoundPermission;
 import cloud.ptl.itemserver.persistence.dao.bundle.BundleDAO;
 import cloud.ptl.itemserver.persistence.dto.address.FullBundleDTO;
-import cloud.ptl.itemserver.persistence.helper.service.BundleService;
-import cloud.ptl.itemserver.persistence.helper.service.SecurityService;
-import cloud.ptl.itemserver.persistence.helper.service.UserService;
 import cloud.ptl.itemserver.persistence.repositories.bundle.BundleRepository;
 import cloud.ptl.itemserver.persistence.repositories.security.UserRepository;
+import cloud.ptl.itemserver.service.BundleService;
+import cloud.ptl.itemserver.service.SecurityService;
+import cloud.ptl.itemserver.service.UserService;
 import cloud.ptl.itemserver.templates.ConfirmationTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -108,9 +108,9 @@ public class BundleController {
                     WebMvcLinkBuilder.linkTo(BundleController.class).withSelfRel()
             );
         }
-        this.securityService.setSecurityHash(bundleDAO);
-        this.logger.debug("Bundle saved");
         bundleRepository.save(bundleDAO);
+        this.logger.debug("Bundle saved");
+
         return new ConfirmationTemplate(
             ConfirmationTemplate.Token.ADD,
                 BundleDAO.class.getName(),
@@ -175,13 +175,14 @@ public class BundleController {
         this.logger.debug("bundle: " + bundleId.toString());
         this.logger.debug("user: " + userId.toString());
         FullBundleDTO fullBundleDTO =
-                this.fullBundleModelAssembler.toModel(
-                        this.bundleService.findById(bundleId)
-                );
+                this.bundleService.findById(bundleId, FullBundleDTO.class);
         this.securityService.grantPermission(
                 fullBundleDTO,
                 CompoundPermission.EDITOR,
                 this.userService.findById(userId)
+        );
+        this.bundleRepository.save(
+                this.bundleService.toBundleDAO(fullBundleDTO)
         );
         this.logger.debug("User added");
         return new ConfirmationTemplate(
@@ -202,7 +203,13 @@ public class BundleController {
         this.logger.info("removing user as editor of bundle");
         this.logger.debug("user: " + userId.toString());
         this.logger.debug("bundle: " + bundleId.toString());
-        this.bundleService.removeUserAsEditor(userId, bundleId);
+        FullBundleDTO fullBundleDTO =
+                this.bundleService.findById(bundleId, FullBundleDTO.class);
+        this.securityService.revokePermission(
+                fullBundleDTO,
+                CompoundPermission.EDITOR,
+                this.userService.findById(userId)
+        );
         this.logger.debug("User removed");
         return new ConfirmationTemplate(
                 ConfirmationTemplate.Token.PATCH,
@@ -223,7 +230,14 @@ public class BundleController {
         this.logger.info("adding user as viewer of bundle");
         this.logger.debug("user: " + userId.toString());
         this.logger.debug("bundle: " + bundleId.toString());
-        this.bundleService.addUserAsViewer(userId, bundleId);
+        FullBundleDTO fullBundleDTO =
+                this.bundleService.findById(bundleId, FullBundleDTO.class);
+        this.securityService.grantPermission(
+                fullBundleDTO,
+                CompoundPermission.VIEWER,
+                this.userService.findById(userId)
+        );
+        this.bundleService.save(fullBundleDTO);
         this.logger.debug("User added");
         return new ConfirmationTemplate(
                 ConfirmationTemplate.Token.PATCH,
@@ -243,7 +257,11 @@ public class BundleController {
         this.logger.info("removing user as viewer of bundle");
         this.logger.debug("user: " + userId.toString());
         this.logger.debug("bundle: " + bundleId.toString());
-        this.bundleService.removeUserAsViewer(userId, bundleId);
+        this.securityService.revokePermission(
+                this.bundleService.findById(bundleId, FullBundleDTO.class),
+                CompoundPermission.VIEWER,
+                this.userService.findById(userId)
+        );
         this.logger.debug("User removed");
         return new ConfirmationTemplate(
                 ConfirmationTemplate.Token.PATCH,

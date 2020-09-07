@@ -46,24 +46,21 @@ public class FoodItemValidator implements Validator {
                 errors.rejectValue("dateAdded", "date.added.missing");
                 return;
             }
-
             // is due date after added date
-            if(dueDate.isBefore(dateAdded)){
+            else if(dueDate.isBefore(dateAdded)){
                 errors.rejectValue("dueDate","due.date.before.date.added");
             }
 
-            // does address exist
+            // does bundle exist
             BundleDAO bundleDAO = foodItemDAO.getBundleDAO();
-
-            // does address exist in request
-            if(bundleDAO == null){
-                errors.rejectValue("addressDAO", "bundle.missing");
-                return;
-            }
-
-            if(!bundleRepository.existsById(bundleDAO.getId())){
+            if(bundleDAO == null) {
                 errors.rejectValue("bundleDAO", "bundle.does.not.exist");
             }
+            else if(!bundleRepository.existsById(bundleDAO.getId())){
+                // does bundle exist in request
+                errors.rejectValue("bundleDAO", "bundle.does.not.exist");
+            }
+
 
             // does food type exist
             FoodTypeDAO foodTypeDAO = foodItemDAO.getType();
@@ -71,10 +68,8 @@ public class FoodItemValidator implements Validator {
             // does food types exist in request
             if(foodTypeDAO == null){
                 errors.rejectValue("type", "type.missing");
-                return;
             }
-
-            if(!foodTypeRepository.existsById(foodTypeDAO.getId())){
+            else if(!foodTypeRepository.existsById(foodTypeDAO.getId())){
                 errors.rejectValue("foodType", "food.type.does.not.exist");
             }
         }

@@ -1,13 +1,15 @@
 package cloud.ptl.itemserver.persistence.dao.authorization;
 
-import lombok.Data;
-
 public enum CompoundPermission {
     EDITOR(
             Permission.READ,
             Permission.CREATE,
             Permission.UPDATE,
             Permission.DELETE
+    ),
+
+    VIEWER(
+            Permission.READ
     );
 
     private final Permission[] permissions;

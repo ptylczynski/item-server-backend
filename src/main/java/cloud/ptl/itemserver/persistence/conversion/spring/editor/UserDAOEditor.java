@@ -1,23 +1,20 @@
 package cloud.ptl.itemserver.persistence.conversion.spring.editor;
 
-import cloud.ptl.itemserver.controllers.UserController;
 import cloud.ptl.itemserver.error.exception.parsing.ObjectUnformatable;
 import cloud.ptl.itemserver.persistence.conversion.dto_assembler.user.UserCensoredModelAssembler;
 import cloud.ptl.itemserver.persistence.dao.authentication.UserDAO;
-import cloud.ptl.itemserver.persistence.dto.user.UserCensoredDTO;
-import cloud.ptl.itemserver.persistence.helper.service.UserService;
 import cloud.ptl.itemserver.persistence.repositories.security.UserRepository;
+import cloud.ptl.itemserver.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.stereotype.Component;
 
 import java.beans.PropertyEditorSupport;
 import java.util.Optional;
 
 @Component
-public class UserEditor extends PropertyEditorSupport {
+public class UserDAOEditor extends PropertyEditorSupport {
 
     @Autowired
     private UserRepository userRepository;
@@ -28,13 +25,13 @@ public class UserEditor extends PropertyEditorSupport {
     @Autowired
     private UserCensoredModelAssembler userCensoredModelAssembler;
 
-    private final Logger logger = LoggerFactory.getLogger(UserEditor.class);
+    private final Logger logger = LoggerFactory.getLogger(UserDAOEditor.class);
 
     @Override
     public String getAsText() {
         this.logger.info("Transforming UserDTO into text");
-        UserCensoredDTO userCensoredDTO = (UserCensoredDTO) this.getValue();
-        return userCensoredDTO.getId().toString();
+        UserDAO userDAO = (UserDAO) this.getValue();
+        return userDAO.getId().toString();
     }
 
     @Override
@@ -46,9 +43,7 @@ public class UserEditor extends PropertyEditorSupport {
         );
         if(userDAO.isEmpty()){
             this.logger.debug("Object unformatable");
-            throw new ObjectUnformatable(
-                    WebMvcLinkBuilder.linkTo(UserController.class).withSelfRel()
-            );
+            throw new IllegalArgumentException(text);
         }
         this.setValue(userDAO.get());
     }

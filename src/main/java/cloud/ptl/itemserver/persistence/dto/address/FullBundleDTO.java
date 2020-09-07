@@ -1,13 +1,11 @@
 package cloud.ptl.itemserver.persistence.dto.address;
 
-import cloud.ptl.itemserver.persistence.dto.user.UserCensoredDTO;
+import cloud.ptl.itemserver.persistence.dao.authorization.SecurityIdentityDAO;
 import cloud.ptl.itemserver.persistence.helper.LongIndexed;
 import cloud.ptl.itemserver.persistence.helper.WithSecurityIdentity;
 import lombok.*;
 import org.springframework.hateoas.RepresentationModel;
 import org.springframework.hateoas.server.core.Relation;
-
-import java.util.Set;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
@@ -18,11 +16,9 @@ import java.util.Set;
 public class FullBundleDTO extends RepresentationModel<FullBundleDTO>
     implements WithSecurityIdentity, LongIndexed {
     private Long id;
-    private String securityHash;
+    private SecurityIdentityDAO securityIdentityDAO;
     private String description;
-    private UserCensoredDTO owner;
-    private Set<UserCensoredDTO> editors;
-    private Set<UserCensoredDTO> viewers;
+    private String name;
 }
 
 

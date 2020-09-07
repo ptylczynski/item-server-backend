@@ -3,7 +3,7 @@ package cloud.ptl.itemserver.security;
 import cloud.ptl.itemserver.persistence.dao.authorization.CompoundPermission;
 import cloud.ptl.itemserver.persistence.dao.authorization.Permission;
 import cloud.ptl.itemserver.persistence.helper.WithSecurityIdentity;
-import cloud.ptl.itemserver.persistence.helper.service.SecurityService;
+import cloud.ptl.itemserver.service.SecurityService;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.PermissionEvaluator;

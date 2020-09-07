@@ -54,6 +54,7 @@ public class ItemServerApplication
                 new ReloadableResourceBundleMessageSource();
         reloadableResourceBundleMessageSource.setBasename("classpath:messages/locale");
         reloadableResourceBundleMessageSource.setDefaultEncoding("UTF-8");
+        reloadableResourceBundleMessageSource.setDefaultLocale(Locale.ENGLISH);
         return reloadableResourceBundleMessageSource;
     }
 

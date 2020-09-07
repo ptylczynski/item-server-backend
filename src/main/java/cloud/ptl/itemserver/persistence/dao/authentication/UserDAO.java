@@ -1,7 +1,8 @@
 package cloud.ptl.itemserver.persistence.dao.authentication;
 
-import cloud.ptl.itemserver.persistence.helper.LongIndexed;
+import cloud.ptl.itemserver.persistence.dao.authorization.SecurityIdentityDAO;
 import cloud.ptl.itemserver.persistence.dao.bundle.BundleDAO;
+import cloud.ptl.itemserver.persistence.helper.LongIndexed;
 import cloud.ptl.itemserver.persistence.helper.WithSecurityIdentity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -25,7 +26,10 @@ public class UserDAO implements LongIndexed, WithSecurityIdentity {
     private Boolean accountNotExpired;
     private Boolean credentialsNotExpired;
     private Boolean accountNotLocked;
-    private String securityHash;
+
+    @OneToOne
+    @JoinColumn(name = "security_identity_id")
+    private SecurityIdentityDAO securityIdentityDAO;
 
     @ManyToMany
     @JoinTable(

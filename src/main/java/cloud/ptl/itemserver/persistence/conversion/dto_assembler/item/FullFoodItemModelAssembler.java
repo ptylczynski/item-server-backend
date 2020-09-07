@@ -6,8 +6,8 @@ import cloud.ptl.itemserver.persistence.dao.bundle.BundleDAO;
 import cloud.ptl.itemserver.persistence.dao.item.food.FoodItemDAO;
 import cloud.ptl.itemserver.persistence.dto.address.FullBundleDTO;
 import cloud.ptl.itemserver.persistence.dto.item.FullFoodItemDTO;
-import cloud.ptl.itemserver.persistence.helper.service.FoodItemService;
 import cloud.ptl.itemserver.persistence.repositories.item.FoodItemRepository;
+import cloud.ptl.itemserver.service.FoodItemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.server.mvc.RepresentationModelAssemblerSupport;
 import org.springframework.stereotype.Component;
@@ -40,7 +40,7 @@ public class FullFoodItemModelAssembler extends RepresentationModelAssemblerSupp
                 .description(entity.getDescription())
                 .name(entity.getName())
                 .type(entity.getType())
-                .securityHash(entity.getSecurityHash())
+                .securityIdentityDAO(entity.getSecurityIdentityDAO())
                 .build();
     }
 

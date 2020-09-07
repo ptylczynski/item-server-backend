@@ -1,21 +1,18 @@
 package cloud.ptl.itemserver.persistence.conversion.spring.editor;
 
-import cloud.ptl.itemserver.controllers.ItemTypeController;
-import cloud.ptl.itemserver.error.exception.parsing.ObjectUnformatable;
 import cloud.ptl.itemserver.persistence.conversion.dto_assembler.itemType.FullFoodTypeModelAssembler;
 import cloud.ptl.itemserver.persistence.dao.item.food.FoodTypeDAO;
 import cloud.ptl.itemserver.persistence.repositories.item.FoodTypeRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.stereotype.Component;
 
 import java.beans.PropertyEditorSupport;
 import java.util.Optional;
 
 @Component
-public class FoodTypeEditor extends PropertyEditorSupport {
+public class FoodTypeDAOEditor extends PropertyEditorSupport {
 
     @Autowired
     private FoodTypeRepository foodTypeRepository;
@@ -23,7 +20,7 @@ public class FoodTypeEditor extends PropertyEditorSupport {
     @Autowired
     private FullFoodTypeModelAssembler fullFoodTypeModelAssembler;
 
-    private final Logger logger = LoggerFactory.getLogger(FoodTypeEditor.class);
+    private final Logger logger = LoggerFactory.getLogger(FoodTypeDAOEditor.class);
 
     @Override
     public void setAsText(String text) throws IllegalArgumentException {
@@ -35,9 +32,7 @@ public class FoodTypeEditor extends PropertyEditorSupport {
         if(foodTypeDAO.isEmpty()){
             this.logger.debug("Object unformatable");
             this.logger.debug("object: " + text);
-            throw new ObjectUnformatable(
-                    WebMvcLinkBuilder.linkTo(ItemTypeController.class).withSelfRel()
-            );
+            throw new IllegalArgumentException(text);
         }
         this.setValue(foodTypeDAO.get());
     }

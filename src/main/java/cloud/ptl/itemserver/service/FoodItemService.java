@@ -1,4 +1,4 @@
-package cloud.ptl.itemserver.persistence.helper.service;
+package cloud.ptl.itemserver.service;
 
 import cloud.ptl.itemserver.controllers.FoodItemController;
 import cloud.ptl.itemserver.error.exception.missing.ObjectNotFound;

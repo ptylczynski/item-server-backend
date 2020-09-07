@@ -6,9 +6,9 @@ import cloud.ptl.itemserver.error.exception.parsing.ObjectUnformatable;
 import cloud.ptl.itemserver.error.exception.validation.UserAlreadyAddedToBundle;
 import cloud.ptl.itemserver.error.exception.validation.UserNotAddedToBundle;
 import cloud.ptl.itemserver.error.resolver.manager.BasicErrorResolverManager;
-import cloud.ptl.itemserver.persistence.conversion.spring.editor.BundleEditor;
-import cloud.ptl.itemserver.persistence.conversion.spring.editor.FoodTypeEditor;
-import cloud.ptl.itemserver.persistence.conversion.spring.editor.UserEditor;
+import cloud.ptl.itemserver.persistence.conversion.spring.editor.BundleDAOEditor;
+import cloud.ptl.itemserver.persistence.conversion.spring.editor.FoodTypeDAOEditor;
+import cloud.ptl.itemserver.persistence.conversion.spring.editor.UserDAOEditor;
 import cloud.ptl.itemserver.persistence.dao.authentication.UserDAO;
 import cloud.ptl.itemserver.persistence.dao.bundle.BundleDAO;
 import cloud.ptl.itemserver.persistence.dao.item.food.FoodTypeDAO;
@@ -23,20 +23,20 @@ import org.springframework.web.bind.annotation.*;
 @ControllerAdvice
 public class ControllerAdvize {
     @Autowired
-    private BundleEditor addressEditor;
+    private BundleDAOEditor bundleEditor;
 
     @Autowired
-    private FoodTypeEditor foodTypeEditor;
+    private FoodTypeDAOEditor foodTypeEditor;
 
     @Autowired
-    private UserEditor userEditor;
+    private UserDAOEditor userEditor;
 
     @Autowired
     private BasicErrorResolverManager basicErrorResolverManager;
 
     @InitBinder
     public void initBinder(WebDataBinder webDataBinder){
-        webDataBinder.registerCustomEditor(BundleDAO.class, addressEditor);
+        webDataBinder.registerCustomEditor(BundleDAO.class, bundleEditor);
         webDataBinder.registerCustomEditor(FoodTypeDAO.class, foodTypeEditor);
         webDataBinder.registerCustomEditor(UserDAO.class, userEditor);
 

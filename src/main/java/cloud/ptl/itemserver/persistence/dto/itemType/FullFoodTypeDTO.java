@@ -1,5 +1,6 @@
 package cloud.ptl.itemserver.persistence.dto.itemType;
 
+import cloud.ptl.itemserver.persistence.dao.authorization.SecurityIdentityDAO;
 import cloud.ptl.itemserver.persistence.helper.LongIndexed;
 import cloud.ptl.itemserver.persistence.helper.WithSecurityIdentity;
 import lombok.AllArgsConstructor;
@@ -17,7 +18,7 @@ import org.springframework.hateoas.server.core.Relation;
 public class FullFoodTypeDTO extends RepresentationModel<FullFoodTypeDTO>
         implements LongIndexed, WithSecurityIdentity {
     private Long id;
-    private String securityHash;
+    private SecurityIdentityDAO securityIdentityDAO;
     private String name;
     private String description;
 }

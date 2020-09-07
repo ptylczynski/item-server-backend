@@ -1,5 +1,6 @@
 package cloud.ptl.itemserver.persistence.dto.item;
 
+import cloud.ptl.itemserver.persistence.dao.authorization.SecurityIdentityDAO;
 import cloud.ptl.itemserver.persistence.dao.item.food.FoodTypeDAO;
 import cloud.ptl.itemserver.persistence.dto.address.FullBundleDTO;
 import cloud.ptl.itemserver.persistence.helper.LongIndexed;
@@ -19,7 +20,7 @@ import java.time.LocalDate;
 public class FullFoodItemDTO extends RepresentationModel<FullFoodItemDTO>
         implements LongIndexed, WithSecurityIdentity {
     private Long id;
-    private String securityHash;
+    private SecurityIdentityDAO securityIdentityDAO;
     private String name;
     private String description;
     private LocalDate dateAdded;
