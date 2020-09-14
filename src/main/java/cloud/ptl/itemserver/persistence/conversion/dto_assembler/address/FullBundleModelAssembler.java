@@ -6,7 +6,7 @@ import cloud.ptl.itemserver.persistence.dao.bundle.BundleDAO;
 import cloud.ptl.itemserver.persistence.dto.address.FullBundleDTO;
 import cloud.ptl.itemserver.persistence.dto.user.UserCensoredDTO;
 import cloud.ptl.itemserver.persistence.repositories.bundle.BundleRepository;
-import cloud.ptl.itemserver.service.BundleService;
+import cloud.ptl.itemserver.service.implementation.BundleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.server.mvc.RepresentationModelAssemblerSupport;
 import org.springframework.stereotype.Component;
@@ -32,7 +32,6 @@ public class FullBundleModelAssembler extends RepresentationModelAssemblerSuppor
         return FullBundleDTO.builder()
                 .id(entity.getId())
                 .description(entity.getDescription())
-                .securityIdentityDAO(entity.getSecurityIdentityDAO())
                 .name(entity.getName())
                 .build();
     }

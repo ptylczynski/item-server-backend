@@ -4,7 +4,7 @@ import cloud.ptl.itemserver.error.exception.parsing.ObjectUnformatable;
 import cloud.ptl.itemserver.persistence.conversion.dto_assembler.user.UserCensoredModelAssembler;
 import cloud.ptl.itemserver.persistence.dao.authentication.UserDAO;
 import cloud.ptl.itemserver.persistence.repositories.security.UserRepository;
-import cloud.ptl.itemserver.service.UserService;
+import cloud.ptl.itemserver.service.implementation.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

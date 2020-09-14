@@ -1,6 +1,6 @@
 package cloud.ptl.itemserver.persistence.dao.bundle;
 
-import cloud.ptl.itemserver.persistence.dao.authorization.SecurityIdentityDAO;
+import cloud.ptl.itemserver.persistence.dao.authorization.AclIdentityDAO;
 import cloud.ptl.itemserver.persistence.helper.LongIndexed;
 import cloud.ptl.itemserver.persistence.helper.WithSecurityIdentity;
 import lombok.Data;
@@ -21,5 +21,5 @@ public class BundleDAO implements LongIndexed, WithSecurityIdentity {
     private String description;
 
     @OneToOne
-    private SecurityIdentityDAO securityIdentityDAO;
+    private AclIdentityDAO securityIdentityDAO;
 }

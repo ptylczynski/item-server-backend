@@ -1,4 +1,4 @@
-package cloud.ptl.itemserver.service;
+package cloud.ptl.itemserver.service.implementation;
 
 import cloud.ptl.itemserver.controllers.BundleController;
 import cloud.ptl.itemserver.error.exception.missing.ObjectNotFound;
@@ -40,6 +40,7 @@ public class BundleService {
     }
 
     public BundleDAO toBundleDAO(FullBundleDTO fullBundleDTO) throws ObjectNotFound {
+        this.logger.info("Converting Full Bundle DTO to Bundle DAO");
         BundleDAO bundleDAO = this.findById(fullBundleDTO.getId(), BundleDAO.class);
         bundleDAO.setDescription(
                 fullBundleDTO.getDescription()
@@ -47,13 +48,11 @@ public class BundleService {
         bundleDAO.setName(
                 fullBundleDTO.getName()
         );
-        bundleDAO.setSecurityIdentityDAO(
-                fullBundleDTO.getSecurityIdentityDAO()
-        );
         return bundleDAO;
     }
 
     public void save(BundleDAO bundleDAO){
+        this.logger.info("Saving bundle to db");
         this.bundleRepository.save(bundleDAO);
     }
 

@@ -1,9 +1,9 @@
 package cloud.ptl.itemserver.security;
 
-import cloud.ptl.itemserver.persistence.dao.authorization.CompoundPermission;
-import cloud.ptl.itemserver.persistence.dao.authorization.Permission;
+import cloud.ptl.itemserver.persistence.dao.authorization.AclPermission;
+import cloud.ptl.itemserver.persistence.helper.LongIndexed;
 import cloud.ptl.itemserver.persistence.helper.WithSecurityIdentity;
-import cloud.ptl.itemserver.service.SecurityService;
+import cloud.ptl.itemserver.service.implementation.SecurityService;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.PermissionEvaluator;
@@ -26,31 +26,17 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
             Object domainObject,
             Object permissionString) {
 
-        // cast domain object
+        // check if object implements Long Indexed
         if(Arrays.stream(domainObject.getClass().getInterfaces()).noneMatch(
-                a -> a.equals(WithSecurityIdentity.class)
+                a -> a.equals(LongIndexed.class)
         )) throw new IllegalArgumentException(
                 "Domain object does not have With Security Identity interface implemented");
 
-        // cast permission
-        try{
-            return this.securityService.hasAccess(
-                    (WithSecurityIdentity) domainObject,
-                    CompoundPermission.valueOf(((String) permissionString).toUpperCase())
-            );
-        } catch (IllegalArgumentException e) {
-            try {
-                return this.securityService.hasAccess(
-                        (WithSecurityIdentity) domainObject,
-                        Permission.valueOf(((String) permissionString).toUpperCase())
-                );
-            }
-            catch (IllegalArgumentException ex){
-                throw new IllegalArgumentException(
-                        "Permission is nor Permission nor CompoundPermission class"
-                );
-            }
-        }
+        AclPermission permission = AclPermission.valueOf(
+                ((String) permissionString).toUpperCase()
+        );
+        LongIndexed object = (LongIndexed) domainObject;
+        return this.securityService.hasPermission(object, permission);
     }
 
     @SneakyThrows

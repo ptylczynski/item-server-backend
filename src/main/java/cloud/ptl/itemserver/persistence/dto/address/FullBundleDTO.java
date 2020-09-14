@@ -1,6 +1,6 @@
 package cloud.ptl.itemserver.persistence.dto.address;
 
-import cloud.ptl.itemserver.persistence.dao.authorization.SecurityIdentityDAO;
+import cloud.ptl.itemserver.persistence.dao.authorization.AclIdentityDAO;
 import cloud.ptl.itemserver.persistence.helper.LongIndexed;
 import cloud.ptl.itemserver.persistence.helper.WithSecurityIdentity;
 import lombok.*;
@@ -14,9 +14,8 @@ import org.springframework.hateoas.server.core.Relation;
 @NoArgsConstructor
 @Relation(itemRelation = "address", collectionRelation = "addresses")
 public class FullBundleDTO extends RepresentationModel<FullBundleDTO>
-    implements WithSecurityIdentity, LongIndexed {
+    implements LongIndexed {
     private Long id;
-    private SecurityIdentityDAO securityIdentityDAO;
     private String description;
     private String name;
 }

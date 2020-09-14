@@ -6,7 +6,7 @@ import cloud.ptl.itemserver.persistence.dao.authentication.UserDAO;
 import cloud.ptl.itemserver.persistence.dto.user.UserCensoredDTO;
 import cloud.ptl.itemserver.persistence.projections.userDAO.UserCensored;
 import cloud.ptl.itemserver.persistence.repositories.security.UserRepository;
-import cloud.ptl.itemserver.service.UserService;
+import cloud.ptl.itemserver.service.implementation.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

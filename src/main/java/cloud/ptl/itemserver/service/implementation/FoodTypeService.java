@@ -1,4 +1,4 @@
-package cloud.ptl.itemserver.service;
+package cloud.ptl.itemserver.service.implementation;
 
 import cloud.ptl.itemserver.controllers.ItemTypeController;
 import cloud.ptl.itemserver.error.exception.missing.ObjectNotFound;

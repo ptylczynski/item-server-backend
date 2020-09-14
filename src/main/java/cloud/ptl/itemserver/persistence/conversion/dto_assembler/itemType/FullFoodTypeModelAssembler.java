@@ -4,7 +4,7 @@ import cloud.ptl.itemserver.error.exception.missing.ObjectNotFound;
 import cloud.ptl.itemserver.persistence.dao.item.generics.ItemTypeDAO;
 import cloud.ptl.itemserver.persistence.dto.itemType.FullFoodTypeDTO;
 import cloud.ptl.itemserver.persistence.repositories.item.FoodTypeRepository;
-import cloud.ptl.itemserver.service.FoodTypeService;
+import cloud.ptl.itemserver.service.implementation.FoodTypeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.server.mvc.RepresentationModelAssemblerSupport;
 import org.springframework.stereotype.Service;

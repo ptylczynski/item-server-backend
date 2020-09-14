@@ -5,7 +5,7 @@ import cloud.ptl.itemserver.persistence.dao.authentication.UserDAO;
 import cloud.ptl.itemserver.persistence.dto.user.UserCensoredDTO;
 import cloud.ptl.itemserver.persistence.projections.userDAO.UserCensored;
 import cloud.ptl.itemserver.persistence.repositories.security.UserRepository;
-import cloud.ptl.itemserver.service.UserService;
+import cloud.ptl.itemserver.service.implementation.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.server.mvc.RepresentationModelAssemblerSupport;
 import org.springframework.stereotype.Component;
@@ -30,7 +30,6 @@ public class UserCensoredModelAssembler extends RepresentationModelAssemblerSupp
                 .id(entity.getId())
                 .mail(entity.getMail())
                 .username(entity.getUsername())
-                .securityIdentityDAO(entity.getSecurityIdentityDAO())
                 .build();
     }
 
@@ -46,7 +45,6 @@ public class UserCensoredModelAssembler extends RepresentationModelAssemblerSupp
                 .mail(entity.getMail())
                 .id(entity.getId())
                 .displayName(entity.getDisplayName())
-                .securityIdentityDAO(entity.getSecurityIdentityDAO())
                 .build();
     }
 }

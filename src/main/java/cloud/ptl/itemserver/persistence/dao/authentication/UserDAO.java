@@ -1,56 +1,37 @@
 package cloud.ptl.itemserver.persistence.dao.authentication;
 
-import cloud.ptl.itemserver.persistence.dao.authorization.SecurityIdentityDAO;
-import cloud.ptl.itemserver.persistence.dao.bundle.BundleDAO;
+import cloud.ptl.itemserver.persistence.dao.authorization.AclIdentityDAO;
 import cloud.ptl.itemserver.persistence.helper.LongIndexed;
 import cloud.ptl.itemserver.persistence.helper.WithSecurityIdentity;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
+import java.util.Collection;
 import java.util.List;
 
-@EqualsAndHashCode(exclude = "locatorOf")
-@Entity(name = "user")
 @Table(name = "user")
 @Data
-public class UserDAO implements LongIndexed, WithSecurityIdentity {
+@Entity
+public class UserDAO implements LongIndexed, UserDetails {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    private String username;
-    private String displayName;
-    private String password;
-    private String mail;
-    private Boolean isEnabled;
-    private Boolean accountNotExpired;
-    private Boolean credentialsNotExpired;
-    private Boolean accountNotLocked;
+    Long id;
+    String username;
+    String displayName;
+    String password;
+    String mail;
+    boolean enabled;
+    boolean accountNonExpired;
+    boolean credentialsNonExpired;
+    boolean accountNonLocked;
 
-    @OneToOne
-    @JoinColumn(name = "security_identity_id")
-    private SecurityIdentityDAO securityIdentityDAO;
-
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "user_authority",
             joinColumns = @JoinColumn(name = "user_fk"),
             inverseJoinColumns = @JoinColumn(name = "authority_fk")
     )
-    private List<AuthorityDAO> authorityDAOList;
-
-    @ManyToOne
-    private BundleDAO locatorOf;
-
-    public User toUser(){
-        return new User(
-                this.username,
-                this.password,
-                this.isEnabled,
-                this.accountNotExpired,
-                this.credentialsNotExpired,
-                this.accountNotLocked,
-                this.authorityDAOList
-        );
-    }
+    List<AuthorityDAO> authorities;
 }

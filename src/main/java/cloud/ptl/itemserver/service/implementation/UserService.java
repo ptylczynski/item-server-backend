@@ -1,4 +1,4 @@
-package cloud.ptl.itemserver.service;
+package cloud.ptl.itemserver.service.implementation;
 
 import cloud.ptl.itemserver.controllers.UserController;
 import cloud.ptl.itemserver.error.exception.missing.ObjectNotFound;
@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -32,6 +33,7 @@ public class UserService {
         return true;
     }
 
+    // used for mail or user name check
     public Boolean checkIfUserExist(String designator) throws ObjectNotFound {
         this.logger.info("Checking if user exist");
         this.logger.debug("Designator=" + designator);
@@ -60,5 +62,9 @@ public class UserService {
         this.logger.debug("id=" + id);
         this.checkIfUserExist(id);
         return this.userRepository.findById(id).get();
+    }
+
+    public UserDAO getLoggedInUserDAO(){
+        return (UserDAO) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 }

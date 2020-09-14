@@ -8,7 +8,7 @@ import cloud.ptl.itemserver.persistence.dao.item.food.FoodItemDAO;
 import cloud.ptl.itemserver.persistence.dto.item.FullFoodItemDTO;
 import cloud.ptl.itemserver.persistence.repositories.item.FoodItemRepository;
 import cloud.ptl.itemserver.persistence.validators.FoodItemValidator;
-import cloud.ptl.itemserver.service.FoodItemService;
+import cloud.ptl.itemserver.service.implementation.FoodItemService;
 import cloud.ptl.itemserver.templates.ConfirmationTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

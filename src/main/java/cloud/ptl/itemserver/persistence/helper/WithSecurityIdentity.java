@@ -1,8 +1,8 @@
 package cloud.ptl.itemserver.persistence.helper;
 
-import cloud.ptl.itemserver.persistence.dao.authorization.SecurityIdentityDAO;
+import cloud.ptl.itemserver.persistence.dao.authorization.AclIdentityDAO;
 
 public interface WithSecurityIdentity {
-    SecurityIdentityDAO getSecurityIdentityDAO();
-    void setSecurityIdentityDAO(SecurityIdentityDAO hash);
+    AclIdentityDAO getSecurityIdentityDAO();
+    void setSecurityIdentityDAO(AclIdentityDAO hash);
 }

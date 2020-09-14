@@ -7,14 +7,14 @@ import cloud.ptl.itemserver.error.exception.validation.UserAlreadyAddedToBundle;
 import cloud.ptl.itemserver.error.exception.validation.UserNotAddedToBundle;
 import cloud.ptl.itemserver.persistence.conversion.dto_assembler.address.FullBundleModelAssembler;
 import cloud.ptl.itemserver.persistence.dao.authentication.UserDAO;
-import cloud.ptl.itemserver.persistence.dao.authorization.CompoundPermission;
+import cloud.ptl.itemserver.persistence.dao.authorization.AclPermission;
 import cloud.ptl.itemserver.persistence.dao.bundle.BundleDAO;
 import cloud.ptl.itemserver.persistence.dto.address.FullBundleDTO;
 import cloud.ptl.itemserver.persistence.repositories.bundle.BundleRepository;
 import cloud.ptl.itemserver.persistence.repositories.security.UserRepository;
-import cloud.ptl.itemserver.service.BundleService;
-import cloud.ptl.itemserver.service.SecurityService;
-import cloud.ptl.itemserver.service.UserService;
+import cloud.ptl.itemserver.service.implementation.BundleService;
+import cloud.ptl.itemserver.service.implementation.SecurityService;
+import cloud.ptl.itemserver.service.implementation.UserService;
 import cloud.ptl.itemserver.templates.ConfirmationTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,8 +65,8 @@ public class BundleController {
     FullBundleDTO getFull(@PathVariable("id") Long id) throws ObjectNotFound {
         this.logger.info("-----------");
         this.logger.info("Getting bundle with id: " + id.toString());
-        Optional<BundleDAO> bundleDAO = this.bundleRepository.findById(id);
         this.bundleService.checkifBundleExists(id);
+        Optional<BundleDAO> bundleDAO = this.bundleRepository.findById(id);
         return fullBundleModelAssembler
                 .toModel(bundleDAO.get())
                 .add(
@@ -110,7 +110,6 @@ public class BundleController {
         }
         bundleRepository.save(bundleDAO);
         this.logger.debug("Bundle saved");
-
         return new ConfirmationTemplate(
             ConfirmationTemplate.Token.ADD,
                 BundleDAO.class.getName(),
@@ -178,11 +177,8 @@ public class BundleController {
                 this.bundleService.findById(bundleId, FullBundleDTO.class);
         this.securityService.grantPermission(
                 fullBundleDTO,
-                CompoundPermission.EDITOR,
+                AclPermission.EDITOR,
                 this.userService.findById(userId)
-        );
-        this.bundleRepository.save(
-                this.bundleService.toBundleDAO(fullBundleDTO)
         );
         this.logger.debug("User added");
         return new ConfirmationTemplate(
@@ -207,7 +203,7 @@ public class BundleController {
                 this.bundleService.findById(bundleId, FullBundleDTO.class);
         this.securityService.revokePermission(
                 fullBundleDTO,
-                CompoundPermission.EDITOR,
+                AclPermission.EDITOR,
                 this.userService.findById(userId)
         );
         this.logger.debug("User removed");
@@ -234,7 +230,7 @@ public class BundleController {
                 this.bundleService.findById(bundleId, FullBundleDTO.class);
         this.securityService.grantPermission(
                 fullBundleDTO,
-                CompoundPermission.VIEWER,
+                AclPermission.VIEWER,
                 this.userService.findById(userId)
         );
         this.bundleService.save(fullBundleDTO);
@@ -259,7 +255,7 @@ public class BundleController {
         this.logger.debug("bundle: " + bundleId.toString());
         this.securityService.revokePermission(
                 this.bundleService.findById(bundleId, FullBundleDTO.class),
-                CompoundPermission.VIEWER,
+                AclPermission.VIEWER,
                 this.userService.findById(userId)
         );
         this.logger.debug("User removed");
