@@ -10,19 +10,19 @@ import cloud.ptl.itemserver.persistence.dao.bundle.BundleDAO;
 import cloud.ptl.itemserver.persistence.dao.item.food.FoodItemDAO;
 import cloud.ptl.itemserver.persistence.dao.item.food.FoodTypeDAO;
 import cloud.ptl.itemserver.persistence.repositories.item.FoodItemRepository;
+import cloud.ptl.itemserver.service.abstract2.AbstractDAOService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public class FoodItemService {
+public class FoodItemService extends AbstractDAOService<FoodItemDAO> {
 
     @Autowired
     private FoodItemRepository foodItemRepository;
@@ -38,7 +38,7 @@ public class FoodItemService {
     @Autowired
     private FoodTypeService foodTypeService;
 
-    public Boolean checkIfFoodItemExists(Long id) throws ObjectNotFound {
+    public Boolean checkIfExists(Long id) throws ObjectNotFound {
         this.logger.info("Checking if item exists");
         this.logger.debug("Id: " + id);
         if(!this.foodItemRepository.existsById(id)){
@@ -55,7 +55,7 @@ public class FoodItemService {
     public FoodItemDAO findById(Long id) throws ObjectNotFound {
         this.logger.info("Searching food item");
         this.logger.debug("id=" + id);
-        this.checkIfFoodItemExists(id);
+        this.checkIfExists(id);
         return this.foodItemRepository.findById(id).get();
     }
 

@@ -8,19 +8,19 @@ import cloud.ptl.itemserver.persistence.dao.authorization.AclEntryDAO;
 import cloud.ptl.itemserver.persistence.dao.authorization.AclPermission;
 import cloud.ptl.itemserver.persistence.dao.item.food.FoodTypeDAO;
 import cloud.ptl.itemserver.persistence.repositories.item.FoodTypeRepository;
+import cloud.ptl.itemserver.service.abstract2.AbstractDAOService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public class FoodTypeService {
+public class FoodTypeService extends AbstractDAOService<FoodTypeDAO> {
     @Autowired
     private FoodTypeRepository foodTypeRepository;
 
@@ -29,7 +29,7 @@ public class FoodTypeService {
 
     private final Logger logger = LoggerFactory.getLogger(FoodTypeService.class);
 
-    public Boolean checkIfFoodTypeExists(Long id) throws ObjectNotFound {
+    public Boolean checkIfExists(Long id) throws ObjectNotFound {
         this.logger.info("Checking if food type exists");
         this.logger.debug("id=" + id);
         if(!this.foodTypeRepository.existsById(id)){
@@ -46,7 +46,7 @@ public class FoodTypeService {
     public FoodTypeDAO findById(Long id) throws ObjectNotFound {
         this.logger.info("Searching food type");
         this.logger.debug("id=" + id);
-        this.checkIfFoodTypeExists(id);
+        this.checkIfExists(id);
         return this.foodTypeRepository.findById(id).get();
     }
 

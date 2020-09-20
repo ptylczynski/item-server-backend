@@ -8,23 +8,22 @@ import cloud.ptl.itemserver.persistence.dao.authorization.AclEntryDAO;
 import cloud.ptl.itemserver.persistence.dao.authorization.AclPermission;
 import cloud.ptl.itemserver.persistence.dao.bundle.BundleDAO;
 import cloud.ptl.itemserver.persistence.dao.item.food.FoodItemDAO;
-import cloud.ptl.itemserver.persistence.dao.item.food.FoodTypeDAO;
 import cloud.ptl.itemserver.persistence.dto.address.FullBundleDTO;
 import cloud.ptl.itemserver.persistence.repositories.authorization.AclEntryRepository;
 import cloud.ptl.itemserver.persistence.repositories.bundle.BundleRepository;
+import cloud.ptl.itemserver.service.abstract2.AbstractDAOService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public class BundleService {
+public class BundleService extends AbstractDAOService<BundleDAO> {
 
     @Autowired
     private BundleRepository bundleRepository;
@@ -52,7 +51,7 @@ public class BundleService {
 
     private final Logger logger = LoggerFactory.getLogger(BundleService.class);
 
-    public Boolean checkifBundleExists(Long id) throws ObjectNotFound {
+    public Boolean checkIfExists(Long id) throws ObjectNotFound {
         this.logger.info("Checking if bundle id=" + id + " exists");
         if(!this.bundleRepository.existsById(id)){
             this.logger.debug("Bundle does not exist");
@@ -91,7 +90,7 @@ public class BundleService {
     public BundleDAO findById(Long id) throws ObjectNotFound {
         this.logger.info("Searching bundle");
         this.logger.debug("id=" + id);
-        this.checkifBundleExists(id);
+        this.checkIfExists(id);
         return this.bundleRepository.findById(id).get();
     }
 

@@ -150,7 +150,7 @@ public class BundleController {
                     linkTo(BundleController.class).withSelfRel()
             );
         }
-        this.bundleService.checkifBundleExists(bundleDAO.getId());
+        this.bundleService.checkIfExists(bundleDAO.getId());
         this.bundleService.hasAccess(bundleDAO, AclPermission.EDITOR);
         this.logger.debug("Bundle updated");
         this.bundleRepository.save(bundleDAO);
