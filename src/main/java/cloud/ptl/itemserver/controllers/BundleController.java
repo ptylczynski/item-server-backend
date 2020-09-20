@@ -2,9 +2,6 @@ package cloud.ptl.itemserver.controllers;
 
 import cloud.ptl.itemserver.error.exception.missing.ObjectNotFound;
 import cloud.ptl.itemserver.error.exception.parsing.ObjectInvalid;
-import cloud.ptl.itemserver.error.exception.validation.BundleInvalid;
-import cloud.ptl.itemserver.error.exception.validation.UserAlreadyAddedToBundle;
-import cloud.ptl.itemserver.error.exception.validation.UserNotAddedToBundle;
 import cloud.ptl.itemserver.persistence.conversion.dto_assembler.address.FullBundleModelAssembler;
 import cloud.ptl.itemserver.persistence.dao.authentication.UserDAO;
 import cloud.ptl.itemserver.persistence.dao.authorization.AclPermission;
@@ -19,17 +16,14 @@ import cloud.ptl.itemserver.templates.ConfirmationTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
-import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import java.security.NoSuchAlgorithmException;
-import java.util.Optional;
+import java.util.List;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
@@ -61,16 +55,15 @@ public class BundleController {
     private SecurityService securityService;
 
     @GetMapping("/{id}")
-    @PostAuthorize("hasPermission(returnObject, 'editor')")
     FullBundleDTO getFull(@PathVariable("id") Long id) throws ObjectNotFound {
         this.logger.info("-----------");
         this.logger.info("Getting bundle with id: " + id.toString());
-        this.bundleService.checkifBundleExists(id);
-        Optional<BundleDAO> bundleDAO = this.bundleRepository.findById(id);
-        return fullBundleModelAssembler
-                .toModel(bundleDAO.get())
-                .add(
-                    linkTo(BundleController.class).withSelfRel()
+        BundleDAO bundleDAO = this.bundleService.findById(id);
+        this.bundleService.hasAccess(bundleDAO, AclPermission.VIEWER);
+        return this.fullBundleModelAssembler.toModel(
+                bundleDAO
+        ).add(
+                linkTo(BundleController.class).withSelfRel()
         );
     }
 
@@ -81,22 +74,21 @@ public class BundleController {
     ){
         this.logger.info("-----------");
         this.logger.info("Getting all bundles");
-        Page<BundleDAO> bundleDAOPage = bundleRepository.findAll(
-                PageRequest.of(page, size)
+        List<BundleDAO> bundleDAOList = this.bundleService.findAll(
+                PageRequest.of(page, size),
+                AclPermission.VIEWER
         );
-        return fullBundleModelAssembler
-                .toCollectionModel(bundleDAOPage.toList())
-                .add(
-                        WebMvcLinkBuilder.linkTo(
-                            methodOn(BundleController.class).getAll(page, size)
-                        ).withSelfRel()
-                );
+        return this.fullBundleModelAssembler.toCollectionModel(
+                bundleDAOList
+        ).add(
+                linkTo(BundleController.class).withSelfRel()
+        );
     }
 
     @PostMapping("")
     EntityModel<String> stringEntityModel(
             BundleDAO bundleDAO,
-            BindingResult bindingResult) throws BundleInvalid, ObjectInvalid, NoSuchAlgorithmException {
+            BindingResult bindingResult) throws ObjectInvalid {
         this.logger.info("-----------");
         this.logger.info("Saving new bundle");
         this.logger.debug(bundleDAO.toString());
@@ -108,7 +100,11 @@ public class BundleController {
                     WebMvcLinkBuilder.linkTo(BundleController.class).withSelfRel()
             );
         }
-        bundleRepository.save(bundleDAO);
+        bundleDAO = bundleRepository.save(bundleDAO);
+        securityService.grantPermission(
+                bundleDAO,
+                AclPermission.EDITOR
+        );
         this.logger.debug("Bundle saved");
         return new ConfirmationTemplate(
             ConfirmationTemplate.Token.ADD,
@@ -124,10 +120,10 @@ public class BundleController {
         this.logger.info("-----------");
         this.logger.info("Deleting address");
         this.logger.debug("id is " + id.toString());
-            Optional<BundleDAO> bundleDAO = this.bundleRepository.findById(id);
-            this.bundleService.checkifBundleExists(id);
-            this.logger.debug("Bundle deleted");
-            this.bundleRepository.delete(bundleDAO.get());
+        BundleDAO bundleDAO = this.bundleService.findById(id);
+        this.bundleService.hasAccess(bundleDAO, AclPermission.EDITOR);
+        this.logger.debug("Bundle deleted");
+        this.bundleRepository.delete(bundleDAO);
         return new ConfirmationTemplate(
                 ConfirmationTemplate.Token.DELETE,
                 BundleDAO.class.getName(),
@@ -155,6 +151,7 @@ public class BundleController {
             );
         }
         this.bundleService.checkifBundleExists(bundleDAO.getId());
+        this.bundleService.hasAccess(bundleDAO, AclPermission.EDITOR);
         this.logger.debug("Bundle updated");
         this.bundleRepository.save(bundleDAO);
         return new ConfirmationTemplate(
@@ -173,10 +170,10 @@ public class BundleController {
         this.logger.info("Adding user as editor to bundle");
         this.logger.debug("bundle: " + bundleId.toString());
         this.logger.debug("user: " + userId.toString());
-        FullBundleDTO fullBundleDTO =
-                this.bundleService.findById(bundleId, FullBundleDTO.class);
+        BundleDAO bundleDAO = this.bundleService.findById(bundleId);
+        this.bundleService.hasAccess(bundleDAO, AclPermission.EDITOR);
         this.securityService.grantPermission(
-                fullBundleDTO,
+                bundleDAO,
                 AclPermission.EDITOR,
                 this.userService.findById(userId)
         );
@@ -194,15 +191,14 @@ public class BundleController {
     public EntityModel<String> removeAsEditor(
             @PathVariable("id") Long bundleId,
             @RequestParam("user_id") Long userId
-    ) throws ObjectNotFound, UserNotAddedToBundle {
+    ) throws ObjectNotFound {
         this.logger.info("-----------");
         this.logger.info("removing user as editor of bundle");
         this.logger.debug("user: " + userId.toString());
         this.logger.debug("bundle: " + bundleId.toString());
-        FullBundleDTO fullBundleDTO =
-                this.bundleService.findById(bundleId, FullBundleDTO.class);
+        BundleDAO bundleDAO = this.bundleService.findById(bundleId);
         this.securityService.revokePermission(
-                fullBundleDTO,
+                bundleDAO,
                 AclPermission.EDITOR,
                 this.userService.findById(userId)
         );
@@ -221,19 +217,17 @@ public class BundleController {
     public EntityModel<String> addAsViewer(
             @PathVariable("id") Long bundleId,
             @RequestParam("user_id") Long userId
-    ) throws ObjectNotFound, UserAlreadyAddedToBundle {
+    ) throws ObjectNotFound {
         this.logger.info("-----------");
         this.logger.info("adding user as viewer of bundle");
         this.logger.debug("user: " + userId.toString());
         this.logger.debug("bundle: " + bundleId.toString());
-        FullBundleDTO fullBundleDTO =
-                this.bundleService.findById(bundleId, FullBundleDTO.class);
+        BundleDAO bundleDAO = this.bundleService.findById(bundleId);
         this.securityService.grantPermission(
-                fullBundleDTO,
+                bundleDAO,
                 AclPermission.VIEWER,
                 this.userService.findById(userId)
         );
-        this.bundleService.save(fullBundleDTO);
         this.logger.debug("User added");
         return new ConfirmationTemplate(
                 ConfirmationTemplate.Token.PATCH,
@@ -248,13 +242,14 @@ public class BundleController {
     public EntityModel<String> removeAsViewer(
             @PathVariable("id") Long bundleId,
             @RequestParam("user_id") Long userId
-    ) throws ObjectNotFound, UserNotAddedToBundle {
+    ) throws ObjectNotFound {
         this.logger.info("-----------");
         this.logger.info("removing user as viewer of bundle");
         this.logger.debug("user: " + userId.toString());
         this.logger.debug("bundle: " + bundleId.toString());
+        BundleDAO bundleDAO = this.bundleService.findById(bundleId);
         this.securityService.revokePermission(
-                this.bundleService.findById(bundleId, FullBundleDTO.class),
+                bundleDAO,
                 AclPermission.VIEWER,
                 this.userService.findById(userId)
         );
@@ -266,5 +261,18 @@ public class BundleController {
                         methodOn(BundleController.class).removeAsViewer(bundleId, userId)
                 ).withSelfRel()
         ).getEntityModel();
+    }
+
+    @GetMapping("/permissions/{id}")
+    public CollectionModel<AclPermission> getPermissions(
+            @PathVariable("id") Long id
+    ) throws ObjectNotFound {
+        BundleDAO bundleDAO = this.bundleService.findById(id);
+        List<AclPermission> permissions = this.securityService.acquiredPermissions(bundleDAO);
+        return CollectionModel.of(
+                permissions
+        ).add(
+                linkTo(BundleController.class).withSelfRel()
+        );
     }
 }

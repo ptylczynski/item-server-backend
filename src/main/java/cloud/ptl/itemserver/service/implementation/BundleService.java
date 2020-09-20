@@ -3,14 +3,22 @@ package cloud.ptl.itemserver.service.implementation;
 import cloud.ptl.itemserver.controllers.BundleController;
 import cloud.ptl.itemserver.error.exception.missing.ObjectNotFound;
 import cloud.ptl.itemserver.persistence.conversion.dto_assembler.address.FullBundleModelAssembler;
+import cloud.ptl.itemserver.persistence.dao.authorization.AclEntryDAO;
+import cloud.ptl.itemserver.persistence.dao.authorization.AclPermission;
 import cloud.ptl.itemserver.persistence.dao.bundle.BundleDAO;
 import cloud.ptl.itemserver.persistence.dto.address.FullBundleDTO;
+import cloud.ptl.itemserver.persistence.repositories.authorization.AclEntryRepository;
 import cloud.ptl.itemserver.persistence.repositories.bundle.BundleRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class BundleService {
@@ -19,10 +27,19 @@ public class BundleService {
     private BundleRepository bundleRepository;
 
     @Autowired
+    private FullBundleModelAssembler fullBundleModelAssembler;
+
+    @Autowired
+    private SecurityService securityService;
+
+    @Autowired
+    private GeneralService generalService;
+
+    @Autowired
     private UserService userService;
 
     @Autowired
-    private FullBundleModelAssembler fullBundleModelAssembler;
+    private AclEntryRepository aclEntryRepository;
 
     private final Logger logger = LoggerFactory.getLogger(BundleService.class);
 
@@ -41,7 +58,7 @@ public class BundleService {
 
     public BundleDAO toBundleDAO(FullBundleDTO fullBundleDTO) throws ObjectNotFound {
         this.logger.info("Converting Full Bundle DTO to Bundle DAO");
-        BundleDAO bundleDAO = this.findById(fullBundleDTO.getId(), BundleDAO.class);
+        BundleDAO bundleDAO = this.findById(fullBundleDTO.getId());
         bundleDAO.setDescription(
                 fullBundleDTO.getDescription()
         );
@@ -62,21 +79,37 @@ public class BundleService {
         );
     }
 
-    public <T> T findById(Long id, Class<T> clazz) throws ObjectNotFound {
+    public BundleDAO findById(Long id) throws ObjectNotFound {
         this.logger.info("Searching bundle");
         this.logger.debug("id=" + id);
         this.checkifBundleExists(id);
-        BundleDAO bundleDAO =
-                this.bundleRepository.findById(id).get();
-        if(clazz.isAssignableFrom(FullBundleDTO.class)){
-            return clazz.cast(this.fullBundleModelAssembler.toModel(bundleDAO));
-        }
-        else if (clazz.isAssignableFrom(BundleDAO.class)){
-            return clazz.cast(bundleDAO);
-        }
-        else{
-            throw new IllegalArgumentException(id.toString());
-        }
+        return this.bundleRepository.findById(id).get();
     }
 
+    public List<BundleDAO> findAll(Pageable pageable, AclPermission permission){
+        this.logger.info("Fetching all bundles accessiable by user");
+        List<AclEntryDAO> aclEntryDAOS =
+                this.securityService.getAllAccesiableAclEntries(
+                        BundleDAO.class,
+                        pageable
+                );
+        List<BundleDAO> bundleDAOS =
+                this.bundleRepository.findAllById(
+                aclEntryDAOS.stream()
+                        // filter for only acl entries with given or higher permission
+                        .filter(a -> a.getAclPermissions().stream()
+                                .anyMatch(permission::sameOrLower))
+                        // extract ids
+                        .map(a -> a.getAclIdentityDAO().getObjectId())
+                        .collect(Collectors.toSet())
+        );
+        this.logger.debug("acl entries: " + aclEntryDAOS.toString());
+        this.logger.debug("bundles: " + bundleDAOS.toString());
+        return bundleDAOS;
+    }
+
+    public Boolean hasAccess(BundleDAO bundleDAO, AclPermission permission){
+        if(this.securityService.hasPermission(bundleDAO, permission)) return true;
+        else throw new AccessDeniedException("Access denied");
+    }
 }

@@ -2,18 +2,20 @@ package cloud.ptl.itemserver.controllers;
 
 import cloud.ptl.itemserver.error.exception.missing.ObjectNotFound;
 import cloud.ptl.itemserver.error.exception.parsing.ObjectInvalid;
-import cloud.ptl.itemserver.error.resolver.manager.BasicErrorResolverManager;
 import cloud.ptl.itemserver.persistence.conversion.dto_assembler.item.FullFoodItemModelAssembler;
+import cloud.ptl.itemserver.persistence.dao.authentication.UserDAO;
+import cloud.ptl.itemserver.persistence.dao.authorization.AclPermission;
 import cloud.ptl.itemserver.persistence.dao.item.food.FoodItemDAO;
 import cloud.ptl.itemserver.persistence.dto.item.FullFoodItemDTO;
 import cloud.ptl.itemserver.persistence.repositories.item.FoodItemRepository;
 import cloud.ptl.itemserver.persistence.validators.FoodItemValidator;
 import cloud.ptl.itemserver.service.implementation.FoodItemService;
+import cloud.ptl.itemserver.service.implementation.SecurityService;
+import cloud.ptl.itemserver.service.implementation.UserService;
 import cloud.ptl.itemserver.templates.ConfirmationTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
@@ -22,9 +24,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
@@ -32,10 +32,6 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 @RestController
 @RequestMapping("/food")
 public class FoodItemController {
-
-    @Autowired
-    BasicErrorResolverManager erm;
-
     @Autowired
     private FoodItemRepository foodItemRepository;
 
@@ -48,6 +44,12 @@ public class FoodItemController {
     @Autowired
     private FoodItemService foodItemService;
 
+    @Autowired
+    private SecurityService securityService;
+
+    @Autowired
+    private UserService userService;
+
     @InitBinder
     protected void initBinder(WebDataBinder webDataBinder){
         webDataBinder.addValidators(foodItemValidator);
@@ -55,30 +57,30 @@ public class FoodItemController {
 
     private final Logger logger = LoggerFactory.getLogger(FoodItemController.class);
 
-    @GetMapping("/number")
-    public EntityModel<Long> getNumber(){
-        this.logger.info("-----------");
-        this.logger.info("Checking number of all intems");
-        Long totalCount = this.foodItemRepository.count();
-        this.logger.debug("Total number of items is " + totalCount.toString() + '\n');
-        return EntityModel.of(
-                totalCount,
-                linkTo(methodOn(FoodItemController.class).getNumber()).withSelfRel()
-        );
-    }
+//    @GetMapping("/number")
+//    public EntityModel<Long> getNumber(){
+//        this.logger.info("-----------");
+//        this.logger.info("Checking number of all intems");
+//        Long totalCount = this.foodItemRepository.count();
+//        this.logger.debug("Total number of items is " + totalCount.toString() + '\n');
+//        return EntityModel.of(
+//                totalCount,
+//                linkTo(methodOn(FoodItemController.class).getNumber()).withSelfRel()
+//        );
+//    }
 
-    @GetMapping("/ids")
-    public CollectionModel<Long> getIds(){
-        this.logger.info("-----------");
-        this.logger.info("Getting ids of all food items " + '\n');
-        List<FoodItemDAO> foods = this.foodItemRepository.findAll();
-        ArrayList<Long> ids = new ArrayList<>();
-        for(FoodItemDAO food : foods) ids.add(food.getId());
-        return CollectionModel.of(
-                ids,
-                linkTo(methodOn(FoodItemController.class).getIds()).withSelfRel()
-        );
-    }
+//    @GetMapping("/ids")
+//    public CollectionModel<Long> getIds(){
+//        this.logger.info("-----------");
+//        this.logger.info("Getting ids of all food items " + '\n');
+//        List<FoodItemDAO> foods = this.foodItemService.findAll();
+//        ArrayList<Long> ids = new ArrayList<>();
+//        for(FoodItemDAO food : foods) ids.add(food.getId());
+//        return CollectionModel.of(
+//                ids,
+//                linkTo(methodOn(FoodItemController.class).getIds()).withSelfRel()
+//        );
+//    }
  // TODO documentation
     @GetMapping("/{id}")
     public FullFoodItemDTO getOne(
@@ -86,12 +88,12 @@ public class FoodItemController {
         this.logger.info("-----------");
         this.logger.info("Getting one item");
         this.logger.debug("Item id: " + id.toString());
-        Optional<FoodItemDAO> foodItemDAO = foodItemRepository.findById(id);
-        this.foodItemService.checkIfFoodItemExists(id);
+        FoodItemDAO foodItemDAO = this.foodItemService.findById(id);
+        this.foodItemService.hasAccess(foodItemDAO, AclPermission.VIEWER);
         this.logger.debug("Item found");
-        this.logger.debug(foodItemDAO.get().toString());
+        this.logger.debug(foodItemDAO.toString());
         return this.fullFoodItemModelAssembler
-                .toModel(foodItemDAO.get())
+                .toModel(foodItemDAO)
                 .add(
                         linkTo(
                                 methodOn(FoodItemController.class).getOne(id)
@@ -107,13 +109,15 @@ public class FoodItemController {
         this.logger.info("-----------");
         this.logger.info(String.format(
                 "Getting info of %d items on page %d" + '\n',
-                page,
-                size
+                size,
+                page
         ));
-        Page<FoodItemDAO> foodItemDAOPage = foodItemRepository.findAll(
-                PageRequest.of(page, size)
-        );
-        return this.fullFoodItemModelAssembler.toCollectionModel(foodItemDAOPage.getContent())
+        List<FoodItemDAO> foodItemDAOS =
+                this.foodItemService.findAll(
+                        PageRequest.of(page, size),
+                        AclPermission.VIEWER
+                );
+        return this.fullFoodItemModelAssembler.toCollectionModel(foodItemDAOS)
                 .add(
                     linkTo(
                             methodOn(FoodItemController.class).getAll(page, size)
@@ -127,17 +131,7 @@ public class FoodItemController {
         this.logger.info("-----------");
         this.logger.info("Saving food");
         this.logger.debug(foodItemDAO.toString());
-        if(!bindingResult.hasErrors()){
-            this.logger.debug("Item is valid " + '\n');
-            foodItemRepository.save(foodItemDAO);
-            this.logger.info("-----------");
-            return new ConfirmationTemplate(
-                    ConfirmationTemplate.Token.ADD,
-                    FoodItemDAO.class.getName(),
-                    linkTo(FoodItemController.class).withSelfRel()
-            ).getEntityModel();
-        }
-        else {
+        if(bindingResult.hasErrors()){
             logger.debug(
                     String.format("Food Item has errors: %s" + '\n', bindingResult.getAllErrors().toString())
             );
@@ -147,6 +141,15 @@ public class FoodItemController {
                     linkTo(FoodItemController.class).withSelfRel()
             );
         }
+        this.logger.debug("Item is valid " + '\n');
+        foodItemDAO = foodItemRepository.save(foodItemDAO);
+        this.securityService.grantPermission(foodItemDAO, AclPermission.EDITOR);
+        this.logger.info("-----------");
+        return new ConfirmationTemplate(
+                ConfirmationTemplate.Token.ADD,
+                FoodItemDAO.class.getName(),
+                linkTo(FoodItemController.class).withSelfRel()
+        ).getEntityModel();
     }
 
     @DeleteMapping("/{id}")
@@ -156,10 +159,10 @@ public class FoodItemController {
         this.logger.info("-----------");
         this.logger.debug("Deleting item");
         this.logger.debug("Item id: " + id.toString());
-        Optional<FoodItemDAO> foodItemDAO = this.foodItemRepository.findById(id);
-        this.foodItemService.checkIfFoodItemExists(id);
+        FoodItemDAO foodItemDAO = this.foodItemService.findById(id);
+        this.foodItemService.hasAccess(foodItemDAO, AclPermission.EDITOR);
         this.logger.debug("Item deleted" + '\n');
-        this.foodItemRepository.delete(foodItemDAO.get());
+        this.foodItemRepository.delete(foodItemDAO);
         return new ConfirmationTemplate(
                 ConfirmationTemplate.Token.DELETE,
                 FoodItemDAO.class.getName(),
@@ -186,8 +189,8 @@ public class FoodItemController {
                     linkTo(FoodItemController.class).withSelfRel()
             );
         }
-        Optional<FoodItemDAO> oldFoodItem = this.foodItemRepository.findById(foodItemDAO.getId());
-        this.foodItemService.checkIfFoodItemExists(foodItemDAO.getId());
+        FoodItemDAO oldFoodItem = this.foodItemService.findById(foodItemDAO.getId());
+        this.foodItemService.hasAccess(oldFoodItem, AclPermission.EDITOR);
         this.logger.debug("Saving new food" + '\n');
         this.foodItemRepository.save(foodItemDAO);
         return new ConfirmationTemplate(
@@ -195,5 +198,124 @@ public class FoodItemController {
                 FoodItemController.class.getName(),
                 linkTo(FoodItemController.class).withSelfRel()
         ).getEntityModel();
+    }
+
+
+    @PatchMapping("/add-editor/{id}")
+    public EntityModel<String> addAsEditor(
+            @PathVariable("id") Long foodItemId,
+            @RequestParam("user_id") Long userId
+    ) throws ObjectNotFound {
+        this.logger.info("-----------");
+        this.logger.info("Adding user as editor to food item");
+        this.logger.debug("food item: " + foodItemId.toString());
+        this.logger.debug("user: " + userId.toString());
+        FoodItemDAO foodItemDAO = this.foodItemService.findById(foodItemId);
+        this.foodItemService.hasAccess(foodItemDAO, AclPermission.EDITOR);
+        this.securityService.grantPermission(
+                foodItemDAO,
+                AclPermission.EDITOR,
+                this.userService.findById(userId)
+        );
+        this.logger.debug("User added");
+        return new ConfirmationTemplate(
+                ConfirmationTemplate.Token.PATCH,
+                UserDAO.class.toString(),
+                linkTo(
+                        methodOn(FoodItemController.class).addAsEditor(foodItemId, userId)
+                ).withSelfRel()
+        ).getEntityModel();
+    }
+
+    @PatchMapping("/remove-editor/{id}")
+    public EntityModel<String> removeAsEditor(
+            @PathVariable("id") Long foodItemId,
+            @RequestParam("user_id") Long userId
+    ) throws ObjectNotFound {
+        this.logger.info("-----------");
+        this.logger.info("removing user as editor of food item");
+        this.logger.debug("user: " + userId.toString());
+        this.logger.debug("food item: " + foodItemId.toString());
+        FoodItemDAO foodItemDAO = this.foodItemService.findById(foodItemId);
+        this.securityService.hasPermission(foodItemDAO, AclPermission.EDITOR);
+        this.securityService.revokePermission(
+                foodItemDAO,
+                AclPermission.EDITOR,
+                this.userService.findById(userId)
+        );
+        this.logger.debug("User removed");
+        return new ConfirmationTemplate(
+                ConfirmationTemplate.Token.PATCH,
+                UserDAO.class.toString(),
+                linkTo(
+                        methodOn(FoodItemController.class).removeAsEditor(foodItemId, userId)
+                ).withSelfRel()
+        ).getEntityModel();
+    }
+
+    @PatchMapping("/add-viewer/{id}")
+    public EntityModel<String> addAsViewer(
+            @PathVariable("id") Long foodItemId,
+            @RequestParam("user_id") Long userId
+    ) throws ObjectNotFound {
+        this.logger.info("-----------");
+        this.logger.info("Adding user as viewer to food item");
+        this.logger.debug("food item: " + foodItemId.toString());
+        this.logger.debug("user: " + userId.toString());
+        FoodItemDAO foodItemDAO = this.foodItemService.findById(foodItemId);
+        this.foodItemService.hasAccess(foodItemDAO, AclPermission.EDITOR);
+        this.securityService.grantPermission(
+                foodItemDAO,
+                AclPermission.VIEWER,
+                this.userService.findById(userId)
+        );
+        this.logger.debug("User added");
+        return new ConfirmationTemplate(
+                ConfirmationTemplate.Token.PATCH,
+                UserDAO.class.toString(),
+                linkTo(
+                        methodOn(FoodItemController.class).addAsEditor(foodItemId, userId)
+                ).withSelfRel()
+        ).getEntityModel();
+    }
+
+    @PatchMapping("/remove-viewer/{id}")
+    public EntityModel<String> removeAsViewer(
+            @PathVariable("id") Long foodItemId,
+            @RequestParam("user_id") Long userId
+    ) throws ObjectNotFound {
+        this.logger.info("-----------");
+        this.logger.info("removing user as viewer of food item");
+        this.logger.debug("user: " + userId.toString());
+        this.logger.debug("food item: " + foodItemId.toString());
+        FoodItemDAO foodItemDAO = this.foodItemService.findById(foodItemId);
+        this.securityService.hasPermission(foodItemDAO, AclPermission.EDITOR);
+        this.securityService.revokePermission(
+                foodItemDAO,
+                AclPermission.VIEWER,
+                this.userService.findById(userId)
+        );
+        this.logger.debug("User removed");
+        return new ConfirmationTemplate(
+                ConfirmationTemplate.Token.PATCH,
+                UserDAO.class.toString(),
+                linkTo(
+                        methodOn(FoodItemController.class).removeAsEditor(foodItemId, userId)
+                ).withSelfRel()
+        ).getEntityModel();
+    }
+
+    @GetMapping("/permissions/{id}")
+    public CollectionModel<AclPermission> getPermissions(
+            @PathVariable("id") Long id
+    ) throws ObjectNotFound {
+        FoodItemDAO foodItemDAO = this.foodItemService.findById(id);
+        List<AclPermission> aclPermissions =
+                this.securityService.acquiredPermissions(foodItemDAO);
+        return CollectionModel.of(
+                aclPermissions
+        ).add(
+                linkTo(FoodItemController.class).withSelfRel()
+        );
     }
 }

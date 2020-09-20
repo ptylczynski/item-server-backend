@@ -1,21 +1,17 @@
 package cloud.ptl.itemserver.persistence.dao.authentication;
 
-import cloud.ptl.itemserver.persistence.dao.authorization.AclIdentityDAO;
+import cloud.ptl.itemserver.persistence.helper.DAOObject;
 import cloud.ptl.itemserver.persistence.helper.LongIndexed;
-import cloud.ptl.itemserver.persistence.helper.WithSecurityIdentity;
-import lombok.*;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.User;
+import lombok.Data;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
-import java.util.Collection;
 import java.util.List;
 
 @Table(name = "user")
 @Data
 @Entity
-public class UserDAO implements LongIndexed, UserDetails {
+public class UserDAO implements LongIndexed, UserDetails, DAOObject {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
     String username;

@@ -10,10 +10,12 @@ import cloud.ptl.itemserver.service.implementation.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -57,9 +59,9 @@ public class UserController {
         this.logger.info("Getting info about user");
         this.logger.debug("username=" + username);
         this.userService.checkIfUserExist(username);
-        Optional<UserDAO> userDAO = this.userRepository.findByUsername(username);
+        UserDAO userDAO = this.userService.findByUsername(username);
         return this.userCensoredModelAssembler
-                .toModel(userDAO.get())
+                .toModel(userDAO)
                 .add(
                         WebMvcLinkBuilder.linkTo(
                                 WebMvcLinkBuilder.methodOn(UserController.class).infoByUsername(username)
@@ -74,10 +76,9 @@ public class UserController {
         this.logger.info("-----------");
         this.logger.info("Getting info about user");
         this.logger.debug("mail=" + mail);
-        this.userService.checkIfUserExist(mail);
-        Optional<UserDAO> userDAO = this.userRepository.findByMail(mail);
+        UserDAO userDAO = this.userService.findByMail(mail);
         return this.userCensoredModelAssembler
-                .toModel(userDAO.get())
+                .toModel(userDAO)
                 .add(
                         WebMvcLinkBuilder.linkTo(
                                 WebMvcLinkBuilder.methodOn(UserController.class).infoByMail(mail)
@@ -86,14 +87,20 @@ public class UserController {
     }
 
     @GetMapping("/all")
-    public CollectionModel<UserCensoredDTO> getAll(){
+    public CollectionModel<UserCensoredDTO> getAll(
+            @RequestParam(value = "page", defaultValue = "0") Integer page,
+            @RequestParam(value = "size", defaultValue = "10") Integer size
+    ){
         this.logger.info("-----------");
-        Iterable<UserDAO> users = this.userRepository.findBy(UserDAO.class);
+        List<UserDAO> userDAOS =
+                this.userService.findAll(
+                        PageRequest.of(page, size)
+                );
         return this.userCensoredModelAssembler
-                .toCollectionModel(users)
+                .toCollectionModel(userDAOS)
                 .add(
                     WebMvcLinkBuilder.linkTo(
-                        WebMvcLinkBuilder.methodOn(UserController.class).getAll()
+                        WebMvcLinkBuilder.methodOn(UserController.class).getAll(page, size)
                     ).withSelfRel()
                 );
     }

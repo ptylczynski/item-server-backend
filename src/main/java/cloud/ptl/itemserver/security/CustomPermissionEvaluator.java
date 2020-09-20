@@ -2,7 +2,6 @@ package cloud.ptl.itemserver.security;
 
 import cloud.ptl.itemserver.persistence.dao.authorization.AclPermission;
 import cloud.ptl.itemserver.persistence.helper.LongIndexed;
-import cloud.ptl.itemserver.persistence.helper.WithSecurityIdentity;
 import cloud.ptl.itemserver.service.implementation.SecurityService;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +14,7 @@ import java.util.Arrays;
 
 @Component
 public class CustomPermissionEvaluator implements PermissionEvaluator {
-
+    // DEPRACTED
     @Autowired
     private SecurityService securityService;
 

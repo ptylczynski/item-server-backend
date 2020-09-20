@@ -33,7 +33,7 @@ public class FullFoodTypeModelAssembler extends RepresentationModelAssemblerSupp
 
     public FullFoodTypeDTO toModel(Long id) throws ObjectNotFound {
         return this.toModel(
-                this.foodTypeService.getById(id)
+                this.foodTypeService.findById(id)
         );
     }
 }
