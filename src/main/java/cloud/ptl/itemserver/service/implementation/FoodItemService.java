@@ -1,10 +1,14 @@
 package cloud.ptl.itemserver.service.implementation;
 
+import cloud.ptl.itemserver.controllers.BundleController;
 import cloud.ptl.itemserver.controllers.FoodItemController;
 import cloud.ptl.itemserver.error.exception.missing.ObjectNotFound;
+import cloud.ptl.itemserver.error.exception.permission.InsufficientPermission;
 import cloud.ptl.itemserver.persistence.dao.authorization.AclEntryDAO;
 import cloud.ptl.itemserver.persistence.dao.authorization.AclPermission;
+import cloud.ptl.itemserver.persistence.dao.bundle.BundleDAO;
 import cloud.ptl.itemserver.persistence.dao.item.food.FoodItemDAO;
+import cloud.ptl.itemserver.persistence.dao.item.food.FoodTypeDAO;
 import cloud.ptl.itemserver.persistence.repositories.item.FoodItemRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,6 +31,12 @@ public class FoodItemService {
     private SecurityService securityService;
 
     private final Logger logger = LoggerFactory.getLogger(FoodItemService.class);
+
+    @Autowired
+    private BundleService bundleService;
+
+    @Autowired
+    private FoodTypeService foodTypeService;
 
     public Boolean checkIfFoodItemExists(Long id) throws ObjectNotFound {
         this.logger.info("Checking if item exists");
@@ -73,6 +83,22 @@ public class FoodItemService {
 
     public Boolean hasAccess(FoodItemDAO foodItemDAO, AclPermission permission){
         if(this.securityService.hasPermission(foodItemDAO, permission)) return true;
-        throw new AccessDeniedException("Access Denied");
+        else throw new InsufficientPermission(
+                FoodItemDAO.class.getCanonicalName(),
+                permission,
+                WebMvcLinkBuilder.linkTo(BundleController.class).withSelfRel()
+        );
+    }
+
+
+    public Boolean checkIfUserHasAccessToBundleAndType(FoodItemDAO foodItem){
+        this.logger.info("Checking if user has access to food type and bundle");
+        FoodTypeDAO foodTypeDAO = foodItem.getType();
+        BundleDAO bundleDAO = foodItem.getBundleDAO();
+        this.logger.debug("food type: " + foodTypeDAO.toString());
+        this.logger.debug("bundle: " + bundleDAO.toString());
+        this.foodTypeService.hasAccess(foodTypeDAO, AclPermission.EDITOR);
+        this.bundleService.hasAccess(bundleDAO, AclPermission.EDITOR);
+        return true;
     }
 }

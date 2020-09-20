@@ -1,7 +1,9 @@
 package cloud.ptl.itemserver.service.implementation;
 
+import cloud.ptl.itemserver.controllers.BundleController;
 import cloud.ptl.itemserver.controllers.ItemTypeController;
 import cloud.ptl.itemserver.error.exception.missing.ObjectNotFound;
+import cloud.ptl.itemserver.error.exception.permission.InsufficientPermission;
 import cloud.ptl.itemserver.persistence.dao.authorization.AclEntryDAO;
 import cloud.ptl.itemserver.persistence.dao.authorization.AclPermission;
 import cloud.ptl.itemserver.persistence.dao.item.food.FoodTypeDAO;
@@ -73,6 +75,10 @@ public class FoodTypeService {
 
     public Boolean hasAccess(FoodTypeDAO foodTypeDAO, AclPermission permission){
         if(this.securityService.hasPermission(foodTypeDAO, permission)) return true;
-        throw new AccessDeniedException("Access Denied");
+        else throw new InsufficientPermission(
+                FoodTypeDAO.class.getCanonicalName(),
+                permission,
+                WebMvcLinkBuilder.linkTo(BundleController.class).withSelfRel()
+        );
     }
 }

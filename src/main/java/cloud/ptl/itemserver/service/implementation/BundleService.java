@@ -2,10 +2,13 @@ package cloud.ptl.itemserver.service.implementation;
 
 import cloud.ptl.itemserver.controllers.BundleController;
 import cloud.ptl.itemserver.error.exception.missing.ObjectNotFound;
+import cloud.ptl.itemserver.error.exception.permission.InsufficientPermission;
 import cloud.ptl.itemserver.persistence.conversion.dto_assembler.address.FullBundleModelAssembler;
 import cloud.ptl.itemserver.persistence.dao.authorization.AclEntryDAO;
 import cloud.ptl.itemserver.persistence.dao.authorization.AclPermission;
 import cloud.ptl.itemserver.persistence.dao.bundle.BundleDAO;
+import cloud.ptl.itemserver.persistence.dao.item.food.FoodItemDAO;
+import cloud.ptl.itemserver.persistence.dao.item.food.FoodTypeDAO;
 import cloud.ptl.itemserver.persistence.dto.address.FullBundleDTO;
 import cloud.ptl.itemserver.persistence.repositories.authorization.AclEntryRepository;
 import cloud.ptl.itemserver.persistence.repositories.bundle.BundleRepository;
@@ -40,6 +43,12 @@ public class BundleService {
 
     @Autowired
     private AclEntryRepository aclEntryRepository;
+
+    @Autowired
+    private BundleService bundleService;
+
+    @Autowired
+    private FoodTypeService foodTypeService;
 
     private final Logger logger = LoggerFactory.getLogger(BundleService.class);
 
@@ -110,6 +119,10 @@ public class BundleService {
 
     public Boolean hasAccess(BundleDAO bundleDAO, AclPermission permission){
         if(this.securityService.hasPermission(bundleDAO, permission)) return true;
-        else throw new AccessDeniedException("Access denied");
+        else throw new InsufficientPermission(
+                FoodItemDAO.class.getCanonicalName(),
+                permission,
+                WebMvcLinkBuilder.linkTo(BundleController.class).withSelfRel()
+        );
     }
 }

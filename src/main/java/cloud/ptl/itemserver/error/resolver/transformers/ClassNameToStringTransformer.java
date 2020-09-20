@@ -16,7 +16,7 @@ public class ClassNameToStringTransformer extends AbstractTransformer<String, St
         return this.messageSource.getMessage(
                 value,
                 new Object[]{},
-                " ? ",
+                value,
                 LocaleContextHolder.getLocale()
         );
     }

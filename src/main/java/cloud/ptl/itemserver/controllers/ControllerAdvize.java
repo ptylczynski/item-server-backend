@@ -3,6 +3,7 @@ package cloud.ptl.itemserver.controllers;
 import cloud.ptl.itemserver.error.exception.missing.ObjectNotFound;
 import cloud.ptl.itemserver.error.exception.parsing.ObjectInvalid;
 import cloud.ptl.itemserver.error.exception.parsing.ObjectUnformatable;
+import cloud.ptl.itemserver.error.exception.permission.InsufficientPermission;
 import cloud.ptl.itemserver.error.exception.validation.UserAlreadyAddedToBundle;
 import cloud.ptl.itemserver.error.exception.validation.UserNotAddedToBundle;
 import cloud.ptl.itemserver.error.resolver.manager.BasicErrorResolverManager;
@@ -86,4 +87,9 @@ public class ControllerAdvize {
     public EntityModel<ErrorTemplate> handle(UserNotAddedToBundle ex){
         return basicErrorResolverManager.resolve(ex);
     }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    @ResponseBody
+    public EntityModel<ErrorTemplate> handle(InsufficientPermission ex) { return basicErrorResolverManager.resolve(ex);}
 }

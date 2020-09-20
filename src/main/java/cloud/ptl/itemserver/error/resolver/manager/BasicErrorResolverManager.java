@@ -30,6 +30,9 @@ public class BasicErrorResolverManager extends ErrorResolverManager {
     @Autowired
     private UserNotAddedToBundleResolverProvider userNotAddedToBundleResolverProvider;
 
+    @Autowired
+    private InsufficientPermissionResolverProvider insufficientPermissionResolverProvider;
+
     private ArrayList<AbstractErrorResolverProvider> providers;
     private final Logger logger = LoggerFactory.getLogger(BasicErrorResolverManager.class);
 
@@ -41,6 +44,7 @@ public class BasicErrorResolverManager extends ErrorResolverManager {
         this.providers.add(dataIntegrityViolationResolverProvider);
         this.providers.add(userAlreadyAddedToBundleErrorResolverProvider);
         this.providers.add(userNotAddedToBundleResolverProvider);
+        this.providers.add(insufficientPermissionResolverProvider);
     }
 
     @Override

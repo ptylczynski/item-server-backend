@@ -142,6 +142,7 @@ public class FoodItemController {
             );
         }
         this.logger.debug("Item is valid " + '\n');
+        this.foodItemService.checkIfUserHasAccessToBundleAndType(foodItemDAO);
         foodItemDAO = foodItemRepository.save(foodItemDAO);
         this.securityService.grantPermission(foodItemDAO, AclPermission.EDITOR);
         this.logger.info("-----------");

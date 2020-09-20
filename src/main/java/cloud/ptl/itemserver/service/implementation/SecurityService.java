@@ -165,7 +165,6 @@ public class SecurityService extends AbstractSecurityService {
     }
 
     private AclIdentityDAO fetchAclIdentity(LongIndexed object) {
-        // TODO throw access denied
         this.logger.info("Fetching acl identity from database");
         Optional<AclIdentityDAO> aclIdentityDAO =
                 this.aclIdentityRepository.findAclIdentityDAOByClazzAndObjectId(
@@ -189,7 +188,6 @@ public class SecurityService extends AbstractSecurityService {
     }
 
     private AclEntryDAO fetchAclEntryDAO(AclIdentityDAO aclIdentityDAO, UserDAO userDAO) {
-        // TODO throw access denied
         this.logger.info("Fetching acl entry from db");
         Optional<AclEntryDAO> aclEntryDAO =
                 this.aclRepository.findAclEntryDAOByAclIdentityDAOAndUserDAO(
