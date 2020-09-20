@@ -2,9 +2,11 @@ package cloud.ptl.itemserver.service.implementation;
 
 import cloud.ptl.itemserver.controllers.UserController;
 import cloud.ptl.itemserver.error.exception.missing.ObjectNotFound;
+import cloud.ptl.itemserver.error.exception.permission.InsufficientPermission;
 import cloud.ptl.itemserver.persistence.dao.authentication.UserDAO;
 import cloud.ptl.itemserver.persistence.dao.authorization.AclPermission;
 import cloud.ptl.itemserver.persistence.repositories.security.UserRepository;
+import cloud.ptl.itemserver.service.abstract2.AbstractDAOService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,13 +14,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
 @Service
-public class UserService {
+public class UserService extends AbstractDAOService<UserDAO> {
 
     @Autowired
     private UserRepository userRepository;
@@ -26,13 +29,16 @@ public class UserService {
     @Autowired
     private SecurityService securityService;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     private final Logger logger = LoggerFactory.getLogger(UserService.class);
     private final ObjectNotFound objectNotFound = new ObjectNotFound(
             UserDAO.class.getCanonicalName(),
             WebMvcLinkBuilder.linkTo(UserController.class).withSelfRel()
     );
 
-    public Boolean checkIfUserExist(Long id) throws ObjectNotFound {
+    public Boolean checkIfExists(Long id) throws ObjectNotFound {
         this.logger.info("Checking if user exists");
         if(!this.userRepository.existsById(id)){
             this.logger.debug("User does not exist");
@@ -43,7 +49,7 @@ public class UserService {
     }
 
     // used for mail or user name check
-    public Boolean checkIfUserExist(String designator) throws ObjectNotFound {
+    public Boolean checkIfExists(String designator) throws ObjectNotFound {
         this.logger.info("Checking if user exist");
         this.logger.debug("Designator=" + designator);
         if(designator.contains("@")){
@@ -69,7 +75,7 @@ public class UserService {
     public UserDAO findById(Long id) throws ObjectNotFound {
         this.logger.info("Searching user");
         this.logger.debug("id=" + id);
-        this.checkIfUserExist(id);
+        this.checkIfExists(id);
         return this.userRepository.findById(id).get();
     }
 
@@ -94,16 +100,23 @@ public class UserService {
 //        );
 //    }
 
-    public List<UserDAO> findAll(Pageable pageable){
+    public List<UserDAO> findAll(Pageable pageable, AclPermission permission){
+        this.logger.info("Fetching all users");
         return this.userRepository.findAll(pageable).getContent();
     }
 
     public Boolean hasAccess(UserDAO userDAO, AclPermission permission){
+        this.logger.info("Checking if user has access");
         if(this.securityService.hasPermission(userDAO, permission)) return true;
-        throw new AccessDeniedException("Access Denied");
+        throw new InsufficientPermission(
+                UserDAO.class.getCanonicalName(),
+                permission,
+                WebMvcLinkBuilder.linkTo(UserController.class).withSelfRel()
+        );
     }
 
     public UserDAO findByUsername(String username) throws ObjectNotFound {
+        this.logger.info("Searching user by username");
         Optional<UserDAO> userDAO = this.userRepository.findByUsername(username);
         if(userDAO.isEmpty())
             throw new ObjectNotFound(
@@ -114,6 +127,7 @@ public class UserService {
     }
 
     public UserDAO findByMail(String mail) throws ObjectNotFound {
+        this.logger.info("Searching user by mail");
         Optional<UserDAO> userDAO =
                 this.userRepository.findByMail(mail);
         if(userDAO.isEmpty())
@@ -122,5 +136,30 @@ public class UserService {
                     WebMvcLinkBuilder.linkTo(UserController.class).withSelfRel()
             );
         return userDAO.get();
+    }
+
+    public void registerUser(UserDAO userDAO){
+        this.logger.debug("encoding password");
+        userDAO.setPassword(
+                this.passwordEncoder.encode(
+                        userDAO.getPassword()
+                )
+        );
+        userDAO.setAccountNonExpired(true);
+        userDAO.setAccountNonLocked(true);
+        userDAO.setCredentialsNonExpired(true);
+        userDAO.setEnabled(true);
+        userDAO = this.userRepository.save(userDAO);
+        this.securityService.grantPermission(userDAO, AclPermission.EDITOR, userDAO);
+    }
+
+    public void updateUser(UserDAO userDAO) throws ObjectNotFound {
+        this.checkIfExists(userDAO.getId());
+        userDAO.setPassword(
+                this.passwordEncoder.encode(
+                        userDAO.getPassword()
+                )
+        );
+        this.userRepository.save(userDAO);
     }
 }

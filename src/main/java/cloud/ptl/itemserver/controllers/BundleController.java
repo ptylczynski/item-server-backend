@@ -180,7 +180,7 @@ public class BundleController {
         this.logger.debug("User added");
         return new ConfirmationTemplate(
                 ConfirmationTemplate.Token.PATCH,
-                UserDAO.class.toString(),
+                BundleDAO.class.getCanonicalName(),
                 linkTo(
                         methodOn(BundleController.class).addAsEditor(bundleId, userId)
                 ).withSelfRel()
@@ -205,7 +205,7 @@ public class BundleController {
         this.logger.debug("User removed");
         return new ConfirmationTemplate(
                 ConfirmationTemplate.Token.PATCH,
-                UserDAO.class.toString(),
+                BundleDAO.class.getCanonicalName(),
                 linkTo(
                         methodOn(BundleController.class).removeAsEditor(bundleId, userId)
                 ).withSelfRel()
@@ -231,7 +231,7 @@ public class BundleController {
         this.logger.debug("User added");
         return new ConfirmationTemplate(
                 ConfirmationTemplate.Token.PATCH,
-                UserDAO.class.toString(),
+                BundleDAO.class.getCanonicalName(),
                 linkTo(
                         methodOn(BundleController.class).addAsViewer(bundleId, userId)
                 ).withSelfRel()
@@ -256,7 +256,7 @@ public class BundleController {
         this.logger.debug("User removed");
         return new ConfirmationTemplate(
                 ConfirmationTemplate.Token.PATCH,
-                UserDAO.class.toString(),
+                BundleDAO.class.getCanonicalName(),
                 linkTo(
                         methodOn(BundleController.class).removeAsViewer(bundleId, userId)
                 ).withSelfRel()

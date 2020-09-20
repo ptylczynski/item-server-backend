@@ -1,6 +1,5 @@
 package cloud.ptl.itemserver;
 
-import cloud.ptl.itemserver.security.CustomPermissionEvaluator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -32,9 +31,6 @@ public class ItemServerApplication
         SpringApplication.run(ItemServerApplication.class, args);
     }
 
-    @Autowired
-    private CustomPermissionEvaluator customPermissionEvaluator;
-
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry
@@ -64,13 +60,5 @@ public class ItemServerApplication
                 new AcceptHeaderLocaleResolver();
         acceptHeaderLocaleResolver.setDefaultLocale(Locale.ENGLISH);
         return acceptHeaderLocaleResolver;
-    }
-
-    @Bean
-    public MethodSecurityExpressionHandler methodSecurityExpressionHandler(){
-        DefaultMethodSecurityExpressionHandler dmseh =
-                new DefaultMethodSecurityExpressionHandler();
-        dmseh.setPermissionEvaluator(this.customPermissionEvaluator);
-        return dmseh;
     }
 }

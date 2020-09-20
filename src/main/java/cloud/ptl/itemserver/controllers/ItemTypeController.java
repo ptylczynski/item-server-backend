@@ -181,7 +181,7 @@ public class ItemTypeController {
         this.logger.debug("User added");
         return new ConfirmationTemplate(
                 ConfirmationTemplate.Token.PATCH,
-                UserDAO.class.toString(),
+                FoodTypeDAO.class.getCanonicalName(),
                 linkTo(
                         methodOn(ItemTypeController.class).addAsEditor(foodTypeId, userId)
                 ).withSelfRel()
@@ -207,7 +207,7 @@ public class ItemTypeController {
         this.logger.debug("User removed");
         return new ConfirmationTemplate(
                 ConfirmationTemplate.Token.PATCH,
-                UserDAO.class.toString(),
+                FoodTypeDAO.class.getCanonicalName(),
                 linkTo(
                         methodOn(ItemTypeController.class).removeAsEditor(foodTypeId, userId)
                 ).withSelfRel()
@@ -234,7 +234,7 @@ public class ItemTypeController {
         this.logger.debug("User added");
         return new ConfirmationTemplate(
                 ConfirmationTemplate.Token.PATCH,
-                UserDAO.class.toString(),
+                FoodTypeDAO.class.getCanonicalName(),
                 linkTo(
                         methodOn(ItemTypeController.class).addAsViewer(foodTypeId, userId)
                 ).withSelfRel()
@@ -260,7 +260,7 @@ public class ItemTypeController {
         this.logger.debug("User removed");
         return new ConfirmationTemplate(
                 ConfirmationTemplate.Token.PATCH,
-                UserDAO.class.toString(),
+                FoodTypeDAO.class.getCanonicalName(),
                 linkTo(
                         methodOn(ItemTypeController.class).removeAsViewer(foodTypeId, userId)
                 ).withSelfRel()
