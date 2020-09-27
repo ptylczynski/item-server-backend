@@ -3,12 +3,10 @@ package cloud.ptl.itemserver.controllers;
 import cloud.ptl.itemserver.error.exception.missing.ObjectNotFound;
 import cloud.ptl.itemserver.error.exception.parsing.ObjectInvalid;
 import cloud.ptl.itemserver.persistence.conversion.dto_assembler.item.FullFoodItemModelAssembler;
-import cloud.ptl.itemserver.persistence.dao.authentication.UserDAO;
 import cloud.ptl.itemserver.persistence.dao.authorization.AclPermission;
 import cloud.ptl.itemserver.persistence.dao.item.food.FoodItemDAO;
 import cloud.ptl.itemserver.persistence.dto.item.FullFoodItemDTO;
 import cloud.ptl.itemserver.persistence.repositories.item.FoodItemRepository;
-import cloud.ptl.itemserver.persistence.validators.FoodItemValidator;
 import cloud.ptl.itemserver.service.implementation.FoodItemService;
 import cloud.ptl.itemserver.service.implementation.SecurityService;
 import cloud.ptl.itemserver.service.implementation.UserService;
@@ -36,9 +34,6 @@ public class FoodItemController {
     private FoodItemRepository foodItemRepository;
 
     @Autowired
-    private FoodItemValidator foodItemValidator;
-
-    @Autowired
     private FullFoodItemModelAssembler fullFoodItemModelAssembler;
 
     @Autowired
@@ -49,11 +44,6 @@ public class FoodItemController {
 
     @Autowired
     private UserService userService;
-
-    @InitBinder
-    protected void initBinder(WebDataBinder webDataBinder){
-        webDataBinder.addValidators(foodItemValidator);
-    }
 
     private final Logger logger = LoggerFactory.getLogger(FoodItemController.class);
 
@@ -81,7 +71,6 @@ public class FoodItemController {
 //                linkTo(methodOn(FoodItemController.class).getIds()).withSelfRel()
 //        );
 //    }
- // TODO documentation
     @GetMapping("/{id}")
     public FullFoodItemDTO getOne(
             @PathVariable Long id) throws ObjectNotFound {

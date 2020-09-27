@@ -9,8 +9,6 @@ import lombok.Data;
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
 
-// TODO nullable = false set for all entities
-
 @Data
 @Entity(name = "bundle")
 public class BundleDAO implements LongIndexed, WithSecurityIdentity, DAOObject {

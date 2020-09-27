@@ -22,6 +22,9 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.mail.MessagingException;
+import javax.validation.Valid;
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.Optional;
 
@@ -114,11 +117,28 @@ public class UserController {
                 );
     }
 
+    @GetMapping("/activate/{id}")
+    public String activate(
+            @PathVariable Long id,
+            @RequestParam("code") String code
+    ) throws ObjectNotFound {
+        this.logger.info("Activating user");
+        UserDAO userDAO = this.userService.findById(id);
+        if(this.userService.validateCode(userDAO, code)){
+            userDAO.setEnabled(true);
+            this.userRepository.save(userDAO);
+            return "OK";
+        }
+        else{
+            return "Error";
+        }
+    }
+
     @PostMapping("")
     public EntityModel<String> post(
-            @Validated UserDAO userDAO,
+            @Valid UserDAO userDAO,
             BindingResult bindingResult
-    ) throws ObjectInvalid {
+    ) throws ObjectInvalid, MessagingException, UnsupportedEncodingException {
         this.logger.info("-----------");
         this.logger.info("Registering user");
         this.logger.debug("user: " + userDAO.toString());

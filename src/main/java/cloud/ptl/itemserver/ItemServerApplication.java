@@ -7,6 +7,9 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.mail.MailSender;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler;
 import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -44,6 +47,8 @@ public class ItemServerApplication
 //        registry.addInterceptor(localeChangeInterceptor());
 //    }
 
+
+
     @Bean
     public MessageSource messageSource(){
         ReloadableResourceBundleMessageSource reloadableResourceBundleMessageSource =
@@ -60,5 +65,26 @@ public class ItemServerApplication
                 new AcceptHeaderLocaleResolver();
         acceptHeaderLocaleResolver.setDefaultLocale(Locale.ENGLISH);
         return acceptHeaderLocaleResolver;
+    }
+
+    @Bean
+    public SimpleMailMessage simpleMailMessage(){
+        SimpleMailMessage simpleMailMessage =
+                new SimpleMailMessage();
+        simpleMailMessage.setFrom("no-reply@ptl.cloud");
+        simpleMailMessage.setReplyTo("item-server@ptl.cloud");
+        return simpleMailMessage;
+    }
+
+    @Bean
+    public JavaMailSenderImpl javaMailSender(){
+        JavaMailSenderImpl javaMailSender = new JavaMailSenderImpl();
+        javaMailSender.setPassword("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");
+        javaMailSender.setUsername("apikey");
+        javaMailSender.setPort(587);
+        javaMailSender.setHost("smtp.sendgrid.net");
+        javaMailSender.setDefaultEncoding("utf-8");
+        javaMailSender.setProtocol("smtp");
+        return javaMailSender;
     }
 }
