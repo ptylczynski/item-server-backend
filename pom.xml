@@ -98,18 +98,10 @@
             <artifactId>hibernate-validator</artifactId>
             <version>6.0.13.Final</version>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/com.h2database/h2 -->
         <dependency>
-            <groupId>com.h2database</groupId>
-            <artifactId>h2</artifactId>
-            <version>1.4.200</version>
-            <scope>test</scope>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
         </dependency>
-        <dependency>
-            <groupId>com.h2database</groupId>
-            <artifactId>h2</artifactId>
-        </dependency>
-
     </dependencies>
 
     <build>
@@ -134,6 +126,14 @@
                 <includes>
                     <include>locale_en.properties</include>
                     <include>locale_pl.properties</include>
+                </includes>
+            </resource>
+            <resource>
+                <directory>src/main/resources/templates</directory>
+                <targetPath>templates</targetPath>
+                <filtering>true</filtering>
+                <includes>
+                    <include>thymeleaf/register_mail.html</include>
                 </includes>
             </resource>
         </resources>

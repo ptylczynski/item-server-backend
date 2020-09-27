@@ -28,9 +28,6 @@ import java.util.List;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
-// TODO move logic outside controller to helper class
-// TODO tweak error messages for API
-
 @RestController
 @RequestMapping("/bundle")
 public class BundleController {

@@ -27,6 +27,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                             "/food/.*",
                             "/address/.*").authenticated()
                     .antMatchers("/ping").permitAll()
+                    .antMatchers("/user/activate/*").permitAll()
                     .anyRequest().authenticated()
                 .and()
                 .httpBasic(httpSecurityHttpBasicConfigurer ->

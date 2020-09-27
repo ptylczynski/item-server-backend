@@ -7,6 +7,8 @@ import cloud.ptl.itemserver.persistence.dao.authentication.UserDAO;
 import cloud.ptl.itemserver.persistence.dao.authorization.AclPermission;
 import cloud.ptl.itemserver.persistence.repositories.security.UserRepository;
 import cloud.ptl.itemserver.service.abstract2.AbstractDAOService;
+import cloud.ptl.itemserver.service.abstract2.AbstractMailingService;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,10 +16,15 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.mail.MessagingException;
+import java.io.UnsupportedEncodingException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -31,6 +38,9 @@ public class UserService extends AbstractDAOService<UserDAO> {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private MailingService mailingService;
 
     private final Logger logger = LoggerFactory.getLogger(UserService.class);
     private final ObjectNotFound objectNotFound = new ObjectNotFound(
@@ -138,7 +148,7 @@ public class UserService extends AbstractDAOService<UserDAO> {
         return userDAO.get();
     }
 
-    public void registerUser(UserDAO userDAO){
+    public void registerUser(UserDAO userDAO) throws MessagingException, UnsupportedEncodingException {
         this.logger.debug("encoding password");
         userDAO.setPassword(
                 this.passwordEncoder.encode(
@@ -148,18 +158,69 @@ public class UserService extends AbstractDAOService<UserDAO> {
         userDAO.setAccountNonExpired(true);
         userDAO.setAccountNonLocked(true);
         userDAO.setCredentialsNonExpired(true);
-        userDAO.setEnabled(true);
+        userDAO.setEnabled(false);
         userDAO = this.userRepository.save(userDAO);
         this.securityService.grantPermission(userDAO, AclPermission.EDITOR, userDAO);
+        Map<String, Object> properties = new HashMap<>();
+        properties.put("user_id", userDAO.getId());
+        properties.put("username", userDAO.getUsername());
+        properties.put(
+                "code",
+                this.createCode(userDAO)
+        );
+        this.mailingService.sendMail(
+                AbstractMailingService.MailType.ACTIVATE_ACC,
+                userDAO,
+                properties
+        );
     }
 
     public void updateUser(UserDAO userDAO) throws ObjectNotFound {
+        UserDAO currentlyLoggedInUser =
+                this.getLoggedInUserDAO();
+        if(!currentlyLoggedInUser.equals(userDAO)){
+            this.logger.debug("User to edit is not the same as logged in user");
+            throw new InsufficientPermission(
+                    UserDAO.class.getCanonicalName(),
+                    AclPermission.EDITOR,
+                    WebMvcLinkBuilder.linkTo(UserController.class).withSelfRel()
+            );
+        }
         this.checkIfExists(userDAO.getId());
+        // encrypt new password
         userDAO.setPassword(
                 this.passwordEncoder.encode(
                         userDAO.getPassword()
                 )
         );
+        // block possibility to enable account just by PUT modified account
+        userDAO.setEnabled(
+                currentlyLoggedInUser.isEnabled()
+        );
+        userDAO.setCredentialsNonExpired(
+                currentlyLoggedInUser.isCredentialsNonExpired()
+        );
+        userDAO.setAccountNonLocked(
+                currentlyLoggedInUser.isAccountNonLocked()
+        );
+        userDAO.setAccountNonExpired(
+                currentlyLoggedInUser.isAccountNonExpired()
+        );
         this.userRepository.save(userDAO);
+    }
+
+    private String createCode(UserDAO userDAO){
+        this.logger.info("Creating code for userDAO");
+        // this.logger.debug("user: " + userDAO.toString());
+        String code = DigestUtils.sha1Hex(userDAO.getUsername() + userDAO.getPassword()).substring(20);
+        this.logger.debug("Code: " + code);
+        return code;
+    }
+
+    public Boolean validateCode(UserDAO userDAO, String code){
+        this.logger.info("Validating user code");
+        Boolean isCodeValid = this.createCode(userDAO).equals(code);
+        this.logger.debug("is code valid: " + isCodeValid);
+        return isCodeValid;
     }
 }

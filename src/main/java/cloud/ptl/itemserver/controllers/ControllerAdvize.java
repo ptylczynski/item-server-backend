@@ -40,11 +40,7 @@ public class ControllerAdvize {
         webDataBinder.registerCustomEditor(BundleDAO.class, bundleEditor);
         webDataBinder.registerCustomEditor(FoodTypeDAO.class, foodTypeEditor);
         webDataBinder.registerCustomEditor(UserDAO.class, userEditor);
-
     }
-
-    // TODO add proper response codes
-    // TODO move logic to error handler from Spring MVC
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
