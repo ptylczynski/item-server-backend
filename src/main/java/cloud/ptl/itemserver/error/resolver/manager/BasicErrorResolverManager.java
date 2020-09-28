@@ -25,12 +25,6 @@ public class BasicErrorResolverManager extends ErrorResolverManager {
     private DataIntegrityViolationResolverProvider dataIntegrityViolationResolverProvider;
 
     @Autowired
-    private UserAlreadyAddedToBundleErrorResolverProvider userAlreadyAddedToBundleErrorResolverProvider;
-
-    @Autowired
-    private UserNotAddedToBundleResolverProvider userNotAddedToBundleResolverProvider;
-
-    @Autowired
     private InsufficientPermissionResolverProvider insufficientPermissionResolverProvider;
 
     private ArrayList<AbstractErrorResolverProvider> providers;
@@ -42,8 +36,6 @@ public class BasicErrorResolverManager extends ErrorResolverManager {
         this.providers.add(objectInvalidResolverProvider);
         this.providers.add(objectNotFoundResolverProvider);
         this.providers.add(dataIntegrityViolationResolverProvider);
-        this.providers.add(userAlreadyAddedToBundleErrorResolverProvider);
-        this.providers.add(userNotAddedToBundleResolverProvider);
         this.providers.add(insufficientPermissionResolverProvider);
     }
 

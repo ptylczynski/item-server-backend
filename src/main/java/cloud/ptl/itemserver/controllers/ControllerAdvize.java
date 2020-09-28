@@ -4,8 +4,6 @@ import cloud.ptl.itemserver.error.exception.missing.ObjectNotFound;
 import cloud.ptl.itemserver.error.exception.parsing.ObjectInvalid;
 import cloud.ptl.itemserver.error.exception.parsing.ObjectUnformatable;
 import cloud.ptl.itemserver.error.exception.permission.InsufficientPermission;
-import cloud.ptl.itemserver.error.exception.validation.UserAlreadyAddedToBundle;
-import cloud.ptl.itemserver.error.exception.validation.UserNotAddedToBundle;
 import cloud.ptl.itemserver.error.resolver.manager.BasicErrorResolverManager;
 import cloud.ptl.itemserver.persistence.conversion.spring.editor.BundleDAOEditor;
 import cloud.ptl.itemserver.persistence.conversion.spring.editor.FoodTypeDAOEditor;
@@ -18,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 
@@ -70,19 +69,6 @@ public class ControllerAdvize {
         return basicErrorResolverManager.resolve(ex);
     }
 
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ResponseBody
-    public EntityModel<ErrorTemplate> handle(UserAlreadyAddedToBundle ex){
-        return basicErrorResolverManager.resolve(ex);
-    }
-
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ResponseBody
-    public EntityModel<ErrorTemplate> handle(UserNotAddedToBundle ex){
-        return basicErrorResolverManager.resolve(ex);
-    }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.UNAUTHORIZED)

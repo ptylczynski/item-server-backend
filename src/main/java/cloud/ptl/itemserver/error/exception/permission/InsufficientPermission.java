@@ -3,8 +3,14 @@ package cloud.ptl.itemserver.error.exception.permission;
 import cloud.ptl.itemserver.persistence.dao.authorization.AclPermission;
 import lombok.*;
 import org.springframework.hateoas.Link;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
+@ResponseStatus(
+        code = HttpStatus.BAD_REQUEST,
+        reason = "user has insufficient permissions"
+)
 public class InsufficientPermission extends AccessDeniedException {
 
     @Setter
