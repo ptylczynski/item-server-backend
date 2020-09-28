@@ -10,7 +10,7 @@ import org.springframework.hateoas.server.core.Relation;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Relation(itemRelation = "address", collectionRelation = "addresses")
+@Relation(itemRelation = "bundle", collectionRelation = "bundles")
 public class FullBundleDTO extends RepresentationModel<FullBundleDTO>
     implements LongIndexed {
     private Long id;

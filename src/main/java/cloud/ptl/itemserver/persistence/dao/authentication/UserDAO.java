@@ -1,5 +1,6 @@
 package cloud.ptl.itemserver.persistence.dao.authentication;
 
+import cloud.ptl.itemserver.persistence.dao.i18n.LocaleDAO;
 import cloud.ptl.itemserver.persistence.helper.LongIndexed;
 import cloud.ptl.itemserver.persistence.validators.annotation.NotDuplicated;
 import cloud.ptl.itemserver.persistence.validators.implementations.NotDuplicatedValidator;
@@ -42,6 +43,7 @@ public class UserDAO implements LongIndexed, UserDetails {
     )
     List<AuthorityDAO> authorities;
 
-    @Enumerated(EnumType.STRING)
-    private Locale locale;
+    @ManyToOne
+    @JoinColumn(name = "locale_fk")
+    private LocaleDAO locale;
 }

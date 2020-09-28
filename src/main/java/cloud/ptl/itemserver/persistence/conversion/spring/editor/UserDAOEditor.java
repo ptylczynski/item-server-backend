@@ -20,23 +20,20 @@ public class UserDAOEditor extends PropertyEditorSupport {
     private UserRepository userRepository;
 
     @Autowired
-    private UserService userService;
-
-    @Autowired
     private UserCensoredModelAssembler userCensoredModelAssembler;
 
     private final Logger logger = LoggerFactory.getLogger(UserDAOEditor.class);
 
     @Override
     public String getAsText() {
-        this.logger.info("Transforming UserDTO into text");
+        this.logger.info("Transforming UserDAO into text");
         UserDAO userDAO = (UserDAO) this.getValue();
         return userDAO.getId().toString();
     }
 
     @Override
     public void setAsText(String text) throws ObjectUnformatable {
-        this.logger.info("Transforming object into UserDTO");
+        this.logger.info("Transforming object into UserDAO");
         this.logger.debug("object: " + text);
         Optional<UserDAO> userDAO = this.userRepository.findById(
                 Long.valueOf(text)

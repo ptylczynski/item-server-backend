@@ -7,16 +7,17 @@ import cloud.ptl.itemserver.error.exception.permission.InsufficientPermission;
 import cloud.ptl.itemserver.error.resolver.manager.BasicErrorResolverManager;
 import cloud.ptl.itemserver.persistence.conversion.spring.editor.BundleDAOEditor;
 import cloud.ptl.itemserver.persistence.conversion.spring.editor.FoodTypeDAOEditor;
+import cloud.ptl.itemserver.persistence.conversion.spring.editor.LocaleDAOEditor;
 import cloud.ptl.itemserver.persistence.conversion.spring.editor.UserDAOEditor;
 import cloud.ptl.itemserver.persistence.dao.authentication.UserDAO;
 import cloud.ptl.itemserver.persistence.dao.bundle.BundleDAO;
+import cloud.ptl.itemserver.persistence.dao.i18n.LocaleDAO;
 import cloud.ptl.itemserver.persistence.dao.item.food.FoodTypeDAO;
 import cloud.ptl.itemserver.templates.ErrorTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,6 +33,9 @@ public class ControllerAdvize {
     private UserDAOEditor userEditor;
 
     @Autowired
+    private LocaleDAOEditor localeDAOEditor;
+
+    @Autowired
     private BasicErrorResolverManager basicErrorResolverManager;
 
     @InitBinder
@@ -39,6 +43,7 @@ public class ControllerAdvize {
         webDataBinder.registerCustomEditor(BundleDAO.class, bundleEditor);
         webDataBinder.registerCustomEditor(FoodTypeDAO.class, foodTypeEditor);
         webDataBinder.registerCustomEditor(UserDAO.class, userEditor);
+        webDataBinder.registerCustomEditor(LocaleDAO.class, localeDAOEditor);
     }
 
     @ExceptionHandler

@@ -103,7 +103,7 @@ public class UserController {
             @RequestParam(value = "size", defaultValue = "10") Integer size
     ){
         this.logger.info("-----------");
-        this.logger.info("Returning all bundle daos");
+        this.logger.info("Returning all user daos");
         this.logger.debug("page: " + page.toString());
         this.logger.debug("size: " + size.toString());
         List<UserDAO> userDAOS =
