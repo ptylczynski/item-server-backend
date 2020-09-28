@@ -11,7 +11,6 @@ import java.util.List;
 @Entity(name = "food_type")
 @PrimaryKeyJoinColumn
 public class FoodTypeDAO extends ItemTypeDAO {
-    @OneToMany
-    @JoinColumn(name = "type_fk")
+    @OneToMany(mappedBy = "type")
     private List<FoodItemDAO> itemsOfType;
 }

@@ -71,21 +71,23 @@ public class ItemTypeController {
     @GetMapping("/food/all")
     public CollectionModel<FullFoodTypeDTO> getAll(
             @RequestParam(defaultValue = "0") Integer page,
-            @RequestParam(defaultValue = "10") Integer size
+            @RequestParam(defaultValue = "10") Integer size,
+            @RequestParam(name = "permission", defaultValue = "viewer") String permission
     ){
         this.logger.info("-----------");
         this.logger.info("Getting all food types");
+        this.logger.debug("permission: " + permission);
         List<FoodTypeDAO> foodTypeDAOS =
                 this.foodTypeService.findAll(
                         PageRequest.of(page, size),
-                        AclPermission.VIEWER
+                        AclPermission.valueOf(permission)
                 );
         return this.fullItemTypeModelAssembler.toCollectionModel(
                     foodTypeDAOS
                 )
                 .add(
                     linkTo(
-                            methodOn(ItemTypeController.class).getAll(page, size)
+                            methodOn(ItemTypeController.class).getAll(page, size, permission)
                     ).withSelfRel()
                 );
     }
@@ -254,7 +256,7 @@ public class ItemTypeController {
         this.securityService.hasPermission(foodTypeDAO, AclPermission.EDITOR);
         this.securityService.revokePermission(
                 foodTypeDAO,
-                AclPermission.EDITOR,
+                AclPermission.VIEWER,
                 this.userService.findById(userId)
         );
         this.logger.debug("User removed");

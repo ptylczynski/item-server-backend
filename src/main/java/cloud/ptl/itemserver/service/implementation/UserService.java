@@ -3,6 +3,7 @@ package cloud.ptl.itemserver.service.implementation;
 import cloud.ptl.itemserver.controllers.UserController;
 import cloud.ptl.itemserver.error.exception.missing.ObjectNotFound;
 import cloud.ptl.itemserver.error.exception.permission.InsufficientPermission;
+import cloud.ptl.itemserver.persistence.dao.authentication.RandomTokenDAO;
 import cloud.ptl.itemserver.persistence.dao.authentication.UserDAO;
 import cloud.ptl.itemserver.persistence.dao.authorization.AclPermission;
 import cloud.ptl.itemserver.persistence.repositories.security.UserRepository;
@@ -42,11 +43,18 @@ public class UserService extends AbstractDAOService<UserDAO> {
     @Autowired
     private MailingService mailingService;
 
+    @Autowired
+    private RandomTokenService randomTokenService;
+
     private final Logger logger = LoggerFactory.getLogger(UserService.class);
     private final ObjectNotFound objectNotFound = new ObjectNotFound(
             UserDAO.class.getCanonicalName(),
             WebMvcLinkBuilder.linkTo(UserController.class).withSelfRel()
     );
+
+    public void save(UserDAO userDAO){
+        this.userRepository.save(userDAO);
+    }
 
     public Boolean checkIfExists(Long id) throws ObjectNotFound {
         this.logger.info("Checking if user exists");
@@ -166,13 +174,30 @@ public class UserService extends AbstractDAOService<UserDAO> {
         properties.put("username", userDAO.getUsername());
         properties.put(
                 "code",
-                this.createCode(userDAO)
+                RandomTokenService.createToken(
+                        RandomTokenDAO.Type.ACC_ACTIVATION,
+                        userDAO
+                ).getToken()
         );
         this.mailingService.sendMail(
                 AbstractMailingService.MailType.ACTIVATE_ACC,
                 userDAO,
                 properties
         );
+    }
+
+    public Boolean activateUser(String code, UserDAO userDAO){
+        this.logger.info("checking if token is valid");
+        Boolean isValid = this.randomTokenService.isValid(code, userDAO);
+        this.logger.debug("is token valid? " + isValid.toString());
+        if(isValid){
+            userDAO.setEnabled(true);
+            this.randomTokenService.delete(code);
+            this.userRepository.save(userDAO);
+            this.logger.debug("user was updated and token removed");
+            return true;
+        }
+        return false;
     }
 
     public void updateUser(UserDAO userDAO) throws ObjectNotFound {
@@ -207,20 +232,5 @@ public class UserService extends AbstractDAOService<UserDAO> {
                 currentlyLoggedInUser.isAccountNonExpired()
         );
         this.userRepository.save(userDAO);
-    }
-
-    private String createCode(UserDAO userDAO){
-        this.logger.info("Creating code for userDAO");
-        // this.logger.debug("user: " + userDAO.toString());
-        String code = DigestUtils.sha1Hex(userDAO.getUsername() + userDAO.getPassword()).substring(20);
-        this.logger.debug("Code: " + code);
-        return code;
-    }
-
-    public Boolean validateCode(UserDAO userDAO, String code){
-        this.logger.info("Validating user code");
-        Boolean isCodeValid = this.createCode(userDAO).equals(code);
-        this.logger.debug("is code valid: " + isCodeValid);
-        return isCodeValid;
     }
 }

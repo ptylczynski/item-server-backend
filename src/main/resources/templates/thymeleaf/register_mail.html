@@ -10,7 +10,7 @@
         <span th:text="#{mail.you.have.successfully.created.account.on}">&nbsp;</span>&nbsp;<i>item-server</i> <br>
         <span th:text="#{mail.to.finish.registration.process.click.link.below}"></span>
     </p>
-    <a th:href="@{http://localhost:8080/api/user/activate/{user_id}(user_id=${user_id}, code=${code})}">link</a>
+    <a th:href="@{http://localhost:8080/api/user/register/activate/{user_id}(user_id=${user_id}, code=${code})}">link</a>
     <p><span th:text="#{mail.thank.you.for.register}"></span><br>
     <span th:text="#{mail.item-server.administration}"></span> </p>
 </body>

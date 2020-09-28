@@ -93,7 +93,8 @@ public class FoodItemController {
     @GetMapping("/all")
     public CollectionModel<FullFoodItemDTO> getAll(
             @RequestParam(defaultValue = "0") Integer page,
-            @RequestParam(defaultValue = "10") Integer size
+            @RequestParam(defaultValue = "10") Integer size,
+            @RequestParam(name = "permission", defaultValue = "viewer") String permission
     ){
         this.logger.info("-----------");
         this.logger.info(String.format(
@@ -104,12 +105,12 @@ public class FoodItemController {
         List<FoodItemDAO> foodItemDAOS =
                 this.foodItemService.findAll(
                         PageRequest.of(page, size),
-                        AclPermission.VIEWER
+                        AclPermission.valueOf(permission)
                 );
         return this.fullFoodItemModelAssembler.toCollectionModel(foodItemDAOS)
                 .add(
                     linkTo(
-                            methodOn(FoodItemController.class).getAll(page, size)
+                            methodOn(FoodItemController.class).getAll(page, size, permission)
                     ).withSelfRel()
                 );
     }
