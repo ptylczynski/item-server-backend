@@ -74,4 +74,9 @@ public class ControllerAdvize {
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     @ResponseBody
     public EntityModel<ErrorTemplate> handle(InsufficientPermission ex) { return basicErrorResolverManager.resolve(ex);}
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public EntityModel<ErrorTemplate> handle(Exception ex){ return basicErrorResolverManager.resolve(ex); }
 }
