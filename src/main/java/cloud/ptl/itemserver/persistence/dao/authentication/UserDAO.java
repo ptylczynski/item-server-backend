@@ -7,6 +7,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
 import java.util.List;
+import java.util.Locale;
 
 @Table(name = "user")
 @Data
@@ -30,4 +31,7 @@ public class UserDAO implements LongIndexed, UserDetails, DAOObject {
             inverseJoinColumns = @JoinColumn(name = "authority_fk")
     )
     List<AuthorityDAO> authorities;
+
+    @Enumerated(EnumType.STRING)
+    private Locale locale;
 }
