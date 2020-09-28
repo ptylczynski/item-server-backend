@@ -29,25 +29,7 @@ public class BundleService extends AbstractDAOService<BundleDAO> {
     private BundleRepository bundleRepository;
 
     @Autowired
-    private FullBundleModelAssembler fullBundleModelAssembler;
-
-    @Autowired
     private SecurityService securityService;
-
-    @Autowired
-    private GeneralService generalService;
-
-    @Autowired
-    private UserService userService;
-
-    @Autowired
-    private AclEntryRepository aclEntryRepository;
-
-    @Autowired
-    private BundleService bundleService;
-
-    @Autowired
-    private FoodTypeService foodTypeService;
 
     private final Logger logger = LoggerFactory.getLogger(BundleService.class);
 
@@ -117,9 +99,12 @@ public class BundleService extends AbstractDAOService<BundleDAO> {
     }
 
     public Boolean hasAccess(BundleDAO bundleDAO, AclPermission permission){
+        this.logger.info("Checking if user has access to bundle");
+        this.logger.debug("bundle: " + bundleDAO.toString());
+        this.logger.debug("permission: " + permission.toString());
         if(this.securityService.hasPermission(bundleDAO, permission)) return true;
         else throw new InsufficientPermission(
-                FoodItemDAO.class.getCanonicalName(),
+                BundleDAO.class.getCanonicalName(),
                 permission,
                 WebMvcLinkBuilder.linkTo(BundleController.class).withSelfRel()
         );

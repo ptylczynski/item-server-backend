@@ -1,6 +1,5 @@
 package cloud.ptl.itemserver.persistence.dao.authentication;
 
-import cloud.ptl.itemserver.persistence.helper.DAOObject;
 import cloud.ptl.itemserver.persistence.helper.LongIndexed;
 import cloud.ptl.itemserver.persistence.validators.annotation.NotDuplicated;
 import cloud.ptl.itemserver.persistence.validators.implementations.NotDuplicatedValidator;
@@ -9,13 +8,12 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @Table(name = "user")
 @Data
 @Entity
-public class UserDAO implements LongIndexed, UserDetails, DAOObject {
+public class UserDAO implements LongIndexed, UserDetails {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
 

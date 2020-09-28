@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.servlet.SpringBootWebSecurityConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -22,12 +23,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     public void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests()
-                    .antMatchers(
-                            "/type/.*",
-                            "/food/.*",
-                            "/address/.*").authenticated()
-                    .antMatchers("/ping").permitAll()
-                    .antMatchers("/user/activate/*").permitAll()
+                    // .antMatchers("/ping/**", "/user/register/**").permitAll()
+                    .antMatchers(HttpMethod.POST, "/user/register/").permitAll()
+                    .antMatchers(HttpMethod.GET, "/user/register/activate/**").permitAll()
+                    .antMatchers(HttpMethod.GET, "/ping/").permitAll()
                     .anyRequest().authenticated()
                 .and()
                 .httpBasic(httpSecurityHttpBasicConfigurer ->

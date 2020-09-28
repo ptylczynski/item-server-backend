@@ -103,6 +103,9 @@ public class UserController {
             @RequestParam(value = "size", defaultValue = "10") Integer size
     ){
         this.logger.info("-----------");
+        this.logger.info("Returning all bundle daos");
+        this.logger.debug("page: " + page.toString());
+        this.logger.debug("size: " + size.toString());
         List<UserDAO> userDAOS =
                 this.userService.findAll(
                         PageRequest.of(page, size),
@@ -117,24 +120,20 @@ public class UserController {
                 );
     }
 
-    @GetMapping("/activate/{id}")
+    @GetMapping("/register/activate/{id}")
     public String activate(
             @PathVariable Long id,
             @RequestParam("code") String code
     ) throws ObjectNotFound {
+        this.logger.info("-----------");
         this.logger.info("Activating user");
+        this.logger.debug("code: " + code);
         UserDAO userDAO = this.userService.findById(id);
-        if(this.userService.validateCode(userDAO, code)){
-            userDAO.setEnabled(true);
-            this.userRepository.save(userDAO);
-            return "OK";
-        }
-        else{
-            return "Error";
-        }
+        if(this.userService.activateUser(code, userDAO)) return "OK";
+        else return "Error";
     }
 
-    @PostMapping("")
+    @PostMapping("/register")
     public EntityModel<String> post(
             @Valid UserDAO userDAO,
             BindingResult bindingResult

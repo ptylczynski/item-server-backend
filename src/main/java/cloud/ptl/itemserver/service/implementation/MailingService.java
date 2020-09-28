@@ -41,6 +41,7 @@ public class MailingService extends AbstractMailingService {
     @Override
     public void sendMail(MailType mailType, UserDAO recipient, Map<String, Object> properties) throws MessagingException, UnsupportedEncodingException {
         this.logger.info("Sending mail");
+        this.logger.debug("properties: " + properties.toString());
         MimeMessage message = this.mailSender.createMimeMessage();
         String recipientMail = recipient.getMail();
         this.logger.debug("recipient: " + recipientMail);
@@ -56,7 +57,7 @@ public class MailingService extends AbstractMailingService {
                 this.getContent(mailType, properties),
                 true
         );
-        this.logger.debug("message: " + mimeMessageHelper.toString());
+        this.logger.debug("message: " + mimeMessageHelper.getMimeMessage().toString());
         this.mailSender.send(message);
     }
     

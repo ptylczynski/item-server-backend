@@ -3,13 +3,17 @@ package cloud.ptl.itemserver.controllers;
 import cloud.ptl.itemserver.error.exception.missing.ObjectNotFound;
 import cloud.ptl.itemserver.error.exception.parsing.ObjectInvalid;
 import cloud.ptl.itemserver.persistence.conversion.dto_assembler.address.FullBundleModelAssembler;
+import cloud.ptl.itemserver.persistence.conversion.dto_assembler.item.FullFoodItemModelAssembler;
 import cloud.ptl.itemserver.persistence.dao.authentication.UserDAO;
 import cloud.ptl.itemserver.persistence.dao.authorization.AclPermission;
 import cloud.ptl.itemserver.persistence.dao.bundle.BundleDAO;
+import cloud.ptl.itemserver.persistence.dao.item.food.FoodItemDAO;
 import cloud.ptl.itemserver.persistence.dto.address.FullBundleDTO;
+import cloud.ptl.itemserver.persistence.dto.item.FullFoodItemDTO;
 import cloud.ptl.itemserver.persistence.repositories.bundle.BundleRepository;
 import cloud.ptl.itemserver.persistence.repositories.security.UserRepository;
 import cloud.ptl.itemserver.service.implementation.BundleService;
+import cloud.ptl.itemserver.service.implementation.FoodItemService;
 import cloud.ptl.itemserver.service.implementation.SecurityService;
 import cloud.ptl.itemserver.service.implementation.UserService;
 import cloud.ptl.itemserver.templates.ConfirmationTemplate;
@@ -24,6 +28,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
@@ -35,12 +40,18 @@ public class BundleController {
     BundleRepository bundleRepository;
 
     @Autowired
+    private FoodItemService foodItemService;
+
+    @Autowired
     UserRepository userRepository;
 
     private final Logger logger = LoggerFactory.getLogger(BundleController.class);
 
     @Autowired
     private FullBundleModelAssembler fullBundleModelAssembler;
+
+    @Autowired
+    private FullFoodItemModelAssembler fullFoodItemModelAssembler;
 
     @Autowired
     private BundleService bundleService;
@@ -67,18 +78,57 @@ public class BundleController {
     @GetMapping("/all")
     public CollectionModel<FullBundleDTO> getAll(
             @RequestParam(defaultValue = "0") Integer page,
-            @RequestParam(defaultValue = "10") Integer size
-    ){
+            @RequestParam(defaultValue = "10") Integer size,
+            @RequestParam(name = "permission", defaultValue = "viewer") String permission
+            ){
         this.logger.info("-----------");
         this.logger.info("Getting all bundles");
+        this.logger.debug("page: " + page.toString());
+        this.logger.debug("size: " + size.toString());
+        this.logger.debug("permission: " + permission);
         List<BundleDAO> bundleDAOList = this.bundleService.findAll(
                 PageRequest.of(page, size),
-                AclPermission.VIEWER
+                AclPermission.valueOf(permission)
         );
         return this.fullBundleModelAssembler.toCollectionModel(
                 bundleDAOList
         ).add(
                 linkTo(BundleController.class).withSelfRel()
+        );
+    }
+
+    @GetMapping("/food/items/{id}")
+    public CollectionModel<FullFoodItemDTO> getFoodItems(
+            @PathVariable("id") Long bundleId,
+            @RequestParam(name = "page", defaultValue = "0") Integer page,
+            @RequestParam(name = "size", defaultValue = "10") Integer size,
+            @RequestParam(name = "itemPermission", defaultValue = "viewer") String itemPermission
+    ) throws ObjectNotFound {
+        this.logger.info("------");
+        this.logger.info("Returning all food items of bundle");
+        BundleDAO bundleDAO = this.bundleService.findById(bundleId);
+        this.logger.debug("bundle: " + bundleDAO.toString());
+        this.logger.debug("item permission: " + itemPermission);
+        this.bundleService.hasAccess(
+                bundleDAO,
+                AclPermission.VIEWER
+        );
+        List<FoodItemDAO> foodItemDAOS = this.foodItemService.findAll(
+                PageRequest.of(page, size),
+                AclPermission.valueOf(itemPermission)
+
+        );
+        foodItemDAOS = foodItemDAOS.stream()
+                .filter(
+                        a -> a.getBundleDAO().equals(bundleDAO)
+                )
+                .collect(Collectors.toList());
+        this.logger.debug("food items: " + foodItemDAOS);
+        this.logger.debug("food permission: " + itemPermission);
+        return this.fullFoodItemModelAssembler.toCollectionModel(
+                foodItemDAOS
+        ).add(
+                WebMvcLinkBuilder.linkTo(BundleController.class).withSelfRel()
         );
     }
 
@@ -194,6 +244,10 @@ public class BundleController {
         this.logger.debug("user: " + userId.toString());
         this.logger.debug("bundle: " + bundleId.toString());
         BundleDAO bundleDAO = this.bundleService.findById(bundleId);
+        this.bundleService.hasAccess(
+                bundleDAO,
+                AclPermission.EDITOR
+        );
         this.securityService.revokePermission(
                 bundleDAO,
                 AclPermission.EDITOR,
@@ -220,6 +274,10 @@ public class BundleController {
         this.logger.debug("user: " + userId.toString());
         this.logger.debug("bundle: " + bundleId.toString());
         BundleDAO bundleDAO = this.bundleService.findById(bundleId);
+        this.bundleService.hasAccess(
+                bundleDAO,
+                AclPermission.EDITOR
+        );
         this.securityService.grantPermission(
                 bundleDAO,
                 AclPermission.VIEWER,
@@ -245,6 +303,10 @@ public class BundleController {
         this.logger.debug("user: " + userId.toString());
         this.logger.debug("bundle: " + bundleId.toString());
         BundleDAO bundleDAO = this.bundleService.findById(bundleId);
+        this.bundleService.hasAccess(
+                bundleDAO,
+                AclPermission.EDITOR
+        );
         this.securityService.revokePermission(
                 bundleDAO,
                 AclPermission.VIEWER,
