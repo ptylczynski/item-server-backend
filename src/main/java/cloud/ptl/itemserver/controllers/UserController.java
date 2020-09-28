@@ -22,6 +22,9 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.mail.MessagingException;
+import javax.validation.Valid;
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.Optional;
 
@@ -100,6 +103,9 @@ public class UserController {
             @RequestParam(value = "size", defaultValue = "10") Integer size
     ){
         this.logger.info("-----------");
+        this.logger.info("Returning all bundle daos");
+        this.logger.debug("page: " + page.toString());
+        this.logger.debug("size: " + size.toString());
         List<UserDAO> userDAOS =
                 this.userService.findAll(
                         PageRequest.of(page, size),
@@ -114,11 +120,24 @@ public class UserController {
                 );
     }
 
-    @PostMapping("")
+    @GetMapping("/register/activate/{id}")
+    public String activate(
+            @PathVariable Long id,
+            @RequestParam("code") String code
+    ) throws ObjectNotFound {
+        this.logger.info("-----------");
+        this.logger.info("Activating user");
+        this.logger.debug("code: " + code);
+        UserDAO userDAO = this.userService.findById(id);
+        if(this.userService.activateUser(code, userDAO)) return "OK";
+        else return "Error";
+    }
+
+    @PostMapping("/register")
     public EntityModel<String> post(
-            @Validated UserDAO userDAO,
+            @Valid UserDAO userDAO,
             BindingResult bindingResult
-    ) throws ObjectInvalid {
+    ) throws ObjectInvalid, MessagingException, UnsupportedEncodingException {
         this.logger.info("-----------");
         this.logger.info("Registering user");
         this.logger.debug("user: " + userDAO.toString());

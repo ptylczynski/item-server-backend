@@ -18,5 +18,5 @@ Backend server for item-server project. Frontend can be found in another project
 - [x] ~~Authentication~~
 - [x] ~~Authorization~~
 - [ ] Sending mails about ending due date
-- [ ] Register new users
+- [x] ~~Register new users~~
 - [ ] Admin panel

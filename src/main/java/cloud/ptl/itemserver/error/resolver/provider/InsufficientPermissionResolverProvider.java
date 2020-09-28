@@ -19,8 +19,6 @@ public class InsufficientPermissionResolverProvider extends AbstractErrorResolve
 
     private final Logger logger = LoggerFactory.getLogger(InsufficientPermissionResolverProvider.class);
 
-    // TODO: resolve method
-
     @Autowired
     private ClassNameToStringTransformer classNameToStringTransformer;
 
