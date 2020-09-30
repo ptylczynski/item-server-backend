@@ -1,5 +1,15 @@
 image: openjdk:8-jdk-alpine
 
 print:
+    stage: test
     script:
         - echo $PATH
+
+deploy_app:
+    stage: deploy
+    script:
+        - apt-get update -y && apt-get install openssh-client -y
+        - eval $(ssh-agent -s)
+        - echo "$SSH_PRIV_KEY" | tr -d '\r' | ssh-add -
+        - echo "$SSH_SERVER_PUB_KEY" >> ~/.ssh/known_hosts
+        - ssh piotr@ptl.cloud 'mkdir abc'
