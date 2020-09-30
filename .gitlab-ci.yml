@@ -8,8 +8,7 @@ print:
 deploy_app:
     stage: deploy
     script:
-        - apt-get update -y && apt-get install openssh-client -y
         - eval $(ssh-agent -s)
-        - echo "$SSH_PRIV_KEY" | tr -d '\r' | ssh-add -
+        - echo "$SSH_PRIV_KEY" | tr -d '\r' 
         - echo "$SSH_SERVER_PUB_KEY" >> ~/.ssh/known_hosts
         - ssh piotr@ptl.cloud 'mkdir abc'
