@@ -5,12 +5,17 @@ print:
     script:
         - echo $PATH
 
+# deploy_app:
+#     stage: deploy
+#     script:
+#         - eval $(ssh-agent -s)
+#         - echo "$SSH_PRIV_KEY" | ssh-add -
+#        - mkdir -p ~/.ssh
+#         - chmod 700 ~/.ssh
+#         - echo "$SSH_SERVER_PUB_KEY" >> ~/.ssh/known_hosts
+#         - ssh piotr@ptl.cloud -p 23 'mkdir abc'
+
 deploy_app:
-    stage: deploy
+    image: docker:19.03.12
     script:
-        - eval $(ssh-agent -s)
-        - echo "$SSH_PRIV_KEY" | ssh-add -
-        - mkdir -p ~/.ssh
-        - chmod 700 ~/.ssh
-        - echo "$SSH_SERVER_PUB_KEY" >> ~/.ssh/known_hosts
-        - ssh piotr@ptl.cloud -p 23 'mkdir abc'
+        - docker info
