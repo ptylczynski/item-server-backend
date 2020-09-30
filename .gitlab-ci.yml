@@ -13,4 +13,4 @@ deploy_app:
         - mkdir -p ~/.ssh
         - chmod 700 ~/.ssh
         - echo "$SSH_SERVER_PUB_KEY" >> ~/.ssh/known_hosts
-        - ssh piotr@ptl.cloud 'mkdir abc'
+        - ssh piotr@ptl.cloud -p 23 'mkdir abc'
