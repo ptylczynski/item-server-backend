@@ -10,5 +10,7 @@ deploy_app:
     script:
         - eval $(ssh-agent -s)
         - echo "$SSH_PRIV_KEY" | ssh-add -
+        - mkdir -p ~/.ssh
+        - chmod 700 ~/.ssh
         - echo "$SSH_SERVER_PUB_KEY" >> ~/.ssh/known_hosts
         - ssh piotr@ptl.cloud 'mkdir abc'
