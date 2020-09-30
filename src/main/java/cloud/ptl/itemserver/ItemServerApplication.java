@@ -1,5 +1,6 @@
 package cloud.ptl.itemserver;
 
+import cloud.ptl.itemserver.misc.CustomLocaleResolver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -47,8 +48,6 @@ public class ItemServerApplication
 //        registry.addInterceptor(localeChangeInterceptor());
 //    }
 
-
-
     @Bean
     public MessageSource messageSource(){
         ReloadableResourceBundleMessageSource reloadableResourceBundleMessageSource =
@@ -59,13 +58,13 @@ public class ItemServerApplication
         return reloadableResourceBundleMessageSource;
     }
 
-    @Bean
-    public LocaleResolver localeResolver(){
-        AcceptHeaderLocaleResolver acceptHeaderLocaleResolver =
-                new AcceptHeaderLocaleResolver();
-        acceptHeaderLocaleResolver.setDefaultLocale(Locale.ENGLISH);
-        return acceptHeaderLocaleResolver;
-    }
+//    @Bean
+//    public LocaleResolver localeResolver(){
+//        AcceptHeaderLocaleResolver acceptHeaderLocaleResolver =
+//                new AcceptHeaderLocaleResolver();
+//        acceptHeaderLocaleResolver.setDefaultLocale(Locale.ENGLISH);
+//        return acceptHeaderLocaleResolver;
+//    }
 
     @Bean
     public SimpleMailMessage simpleMailMessage(){

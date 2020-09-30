@@ -6,6 +6,7 @@ import cloud.ptl.itemserver.error.exception.permission.InsufficientPermission;
 import cloud.ptl.itemserver.persistence.dao.authentication.RandomTokenDAO;
 import cloud.ptl.itemserver.persistence.dao.authentication.UserDAO;
 import cloud.ptl.itemserver.persistence.dao.authorization.AclPermission;
+import cloud.ptl.itemserver.persistence.dao.i18n.LocaleDAO;
 import cloud.ptl.itemserver.persistence.repositories.security.UserRepository;
 import cloud.ptl.itemserver.service.abstract2.AbstractDAOService;
 import cloud.ptl.itemserver.service.abstract2.AbstractMailingService;
@@ -23,10 +24,7 @@ import org.springframework.stereotype.Service;
 
 import javax.mail.MessagingException;
 import java.io.UnsupportedEncodingException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class UserService extends AbstractDAOService<UserDAO> {
@@ -232,5 +230,26 @@ public class UserService extends AbstractDAOService<UserDAO> {
                 currentlyLoggedInUser.isAccountNonExpired()
         );
         this.userRepository.save(userDAO);
+    }
+
+    public Locale getLocale(){
+        UserDAO loggedInUser = this.getLoggedInUserDAO();
+        if(loggedInUser != null){
+            Locale locale =
+                    Locale.forLanguageTag(loggedInUser.getLocale().getLanguage());
+            if(locale != null) return locale;
+        }
+        return null;
+    }
+
+    public void setLocale(Locale locale){
+        UserDAO loggedInUser = this.getLoggedInUserDAO();
+        loggedInUser.setLocale(
+                LocaleDAO.builder()
+                    .country(locale.getCountry())
+                    .language(locale.getLanguage())
+                    .build()
+        );
+        this.userRepository.save(loggedInUser);
     }
 }
