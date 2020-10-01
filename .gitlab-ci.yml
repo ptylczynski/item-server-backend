@@ -13,3 +13,6 @@ deploy_app:
         - chmod 700 ~/.ssh
         - echo "$SSH_SERVER_PUB_KEY" >> ~/.ssh/known_hosts
         - ssh item-server@ptl.cloud -p 23 '/opt/item-server-backend/update.sh'
+    only:
+        variable:
+            $CI_COMMIT_TAG =~ /\-release^/i
