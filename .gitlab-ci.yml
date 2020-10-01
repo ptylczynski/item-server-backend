@@ -1,6 +1,5 @@
-image: openjdk:8-jdk-alpine
-
 print:
+    image: openjdk:8-jdk-alpine
     stage: test
     script:
         - echo $PATH
