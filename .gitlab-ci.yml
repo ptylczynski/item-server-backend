@@ -15,4 +15,4 @@ deploy_app:
         - ssh item-server@ptl.cloud -p 23 '/opt/item-server-backend/update.sh'
     only:
         variables:
-            $CI_COMMIT_TAG =~ /\-release^/i
+            - $CI_COMMIT_TAG =~ /\-release^/i
