@@ -6,6 +6,7 @@ print:
         - echo $PATH
 
 deploy_app:
+    stage: build
     image:
         name: gcr.io/kaniko-project/executor:debug
         entrypoint: [""]
