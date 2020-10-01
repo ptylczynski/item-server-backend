@@ -42,7 +42,7 @@ public class ItemServerApplication
     public void addCorsMappings(CorsRegistry registry) {
         registry
                 .addMapping("/**")
-                    .allowedOrigins("http://localhost:4200")
+                    .allowedOrigins("http://localhost:4200", "https://item-server.ptl.cloud")
                     .allowedMethods("GET", "POST", "DELETE", "PUT", "PATCH");
     }
 
