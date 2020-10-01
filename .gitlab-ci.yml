@@ -6,11 +6,10 @@ print:
 
 deploy_app:
     stage: deploy
-    image:
-        name: gcr.io/kaniko-project/executor:debug
-        entrypoint: [""]
-        user: root
     script:
-        - mkdir -p /kaniko/.docker
-        - echo "{\"auths\":{\"$PUSH_REGISTRY\":{\"username\":\"$PUSH_USER\",\"password\":\"$PUSH_PASSWORD\"}}}" > /kaniko/.docker/config.json
-        - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/Dockerfile --destination $PUSH_REGISTRY:$CI_COMMIT_TAG
+        - eval $(ssh-agent -s)
+        - echo "$SSH_PRIV_KEY" | ssh-add -
+        - mkdir -p ~/.ssh
+        - chmod 700 ~/.ssh
+        - echo "$SSH_SERVER_PUB_KEY" >> ~/.ssh/known_hosts
+        - ssh item-server@ptl.cloud -p 23 '/opt/item-server-backend/update.sh'
