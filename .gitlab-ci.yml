@@ -1,21 +1,17 @@
-image: openjdk:8-jdk-alpine
-
 print:
+    image: openjdk:8-jdk-alpine
     stage: test
     script:
         - echo $PATH
 
-# deploy_app:
-#     stage: deploy
-#     script:
-#         - eval $(ssh-agent -s)
-#         - echo "$SSH_PRIV_KEY" | ssh-add -
-#        - mkdir -p ~/.ssh
-#         - chmod 700 ~/.ssh
-#         - echo "$SSH_SERVER_PUB_KEY" >> ~/.ssh/known_hosts
-#         - ssh piotr@ptl.cloud -p 23 'mkdir abc'
-
 deploy_app:
-    image: docker:19.03.12
+    stage: deploy
     script:
-        - docker info
+        - eval $(ssh-agent -s)
+        - echo "$SSH_PRIV_KEY" | ssh-add -
+        - mkdir -p ~/.ssh
+        - chmod 700 ~/.ssh
+        - echo "$SSH_SERVER_PUB_KEY" >> ~/.ssh/known_hosts
+        - ssh item-server@ptl.cloud -p 23 '/opt/item-server-backend/update.sh'
+    rules:
+        - if: $CI_COMMIT_BRANCH == "master"
