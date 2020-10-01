@@ -16,6 +16,10 @@ print:
 #         - ssh piotr@ptl.cloud -p 23 'mkdir abc'
 
 deploy_app:
-    image: docker:19.03.12
-    script:
-        - docker info
+    image:
+        name: gcr.io/kaniko-project/executor:debug
+        entrypoint: [""]
+        script:
+            - mkdir -p /kaniko/.docker
+            - echo "{\"auths\":{\"$PUSH_REGISTRY\":{\"username\":\"$PUSH_USER\",\"password\":\"$PUSH_PASSWORD\"}}}" > /kaniko/.docker/config.json
+            - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/Dockerfile --destination $PUSH_REGISTRY:$CI_COMMIT_TAG
