@@ -5,7 +5,7 @@ print:
     script:
         - echo $PATH
 
-deploy_app:
+deploy app:
     image:
         name: gcr.io/kaniko-project/executor:debug
         entrypoint: [""]
