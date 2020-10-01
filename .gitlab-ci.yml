@@ -9,6 +9,7 @@ deploy_app:
     image:
         name: gcr.io/kaniko-project/executor:debug
         entrypoint: [""]
+        user: root
     script:
         - mkdir -p /kaniko/.docker
         - echo "{\"auths\":{\"$PUSH_REGISTRY\":{\"username\":\"$PUSH_USER\",\"password\":\"$PUSH_PASSWORD\"}}}" > /kaniko/.docker/config.json
