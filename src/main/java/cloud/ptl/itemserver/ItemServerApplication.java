@@ -8,6 +8,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.mail.MailSender;
@@ -31,8 +32,12 @@ import java.util.Locale;
 @EnableGlobalMethodSecurity(
         prePostEnabled = true
 )
+@PropertySource("classpath:application.secrets.properties")
 public class ItemServerApplication
     implements WebMvcConfigurer{
+
+    @Value("${mail.password}")
+    private String mailPassword;
 
     public static void main(String[] args) {
         SpringApplication.run(ItemServerApplication.class, args);
@@ -81,7 +86,7 @@ public class ItemServerApplication
     @Bean
     public JavaMailSenderImpl javaMailSender(){
         JavaMailSenderImpl javaMailSender = new JavaMailSenderImpl();
-        javaMailSender.setPassword("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");
+        javaMailSender.setPassword(this.mailPassword);
         javaMailSender.setUsername("apikey");
         javaMailSender.setPort(587);
         javaMailSender.setHost("smtp.sendgrid.net");
