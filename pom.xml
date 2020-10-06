@@ -120,6 +120,7 @@
                     <include>application.properties</include>
                     <include>application-production.properties</include>
                     <include>application-development.properties</include>
+                    <include>application.secrets.properties</include>
                 </includes>
             </resource>
             <resource>
